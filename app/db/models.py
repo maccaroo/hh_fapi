@@ -29,11 +29,11 @@ class Sensor(Base):
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)  # Fully qualified name
 
-    values = relationship("SensorValue", back_populates="sensor", cascade="all, delete-orphan")
+    readings = relationship("Reading", back_populates="sensor", cascade="all, delete-orphan")
 
 
-class SensorValue(Base):
-    __tablename__ = "sensor_values"
+class Reading(Base):
+    __tablename__ = "readings"
 
     id = Column(Integer, primary_key=True, index=True)
     sensor_id = Column(Integer, ForeignKey("sensors.id"), nullable=False)
@@ -41,4 +41,4 @@ class SensorValue(Base):
     value = Column(Float, nullable=False)
     extra_metadata = Column(JSONEncodedDict, nullable=True)
 
-    sensor = relationship("Sensor", back_populates="values")
+    sensor = relationship("Sensor", back_populates="readings")

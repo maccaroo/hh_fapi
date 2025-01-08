@@ -3,15 +3,15 @@ from typing import Any, Optional
 from pydantic import BaseModel
 
 
-class SensorValueBase(BaseModel):
+class ReadingBase(BaseModel):
     recorded_at: datetime = datetime.now(timezone.utc)
     value: float
     extra_metadata: Optional[Any] = None
 
-class SensorValueCreate(SensorValueBase):
+class ReadingCreate(ReadingBase):
     sensor_id: int
 
-class SensorValue(SensorValueBase):
+class Reading(ReadingBase):
     id: int
     sensor_id: int
 
