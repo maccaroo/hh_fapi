@@ -1,20 +1,13 @@
 from fastapi import FastAPI
-from app.routes import items, root
-from app.db import database
+from app.routers import root, sensors, sensor_values
+from app.db.database import init_db
 
 app = FastAPI()
 
+# Initialize database
+init_db()
 
-# Routers
+# Include routers
 app.include_router(root.router)
-app.include_router(items.router)
-
-
-# Database connection events
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
+app.include_router(sensors.router, prefix="/sensors", tags=["Sensors"])
+app.include_router(sensor_values.router, prefix="/sensor-values", tags=["Sensor Values"])
