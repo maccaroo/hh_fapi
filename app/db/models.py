@@ -1,7 +1,25 @@
-import datetime  # Import the module instead of just the class
+import datetime
+import json
 from sqlalchemy import Column, Integer, String, Text, DateTime, Float, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import TypeDecorator
 from app.db.base import Base
+
+
+class JSONEncodedDict(TypeDecorator):
+    """Custom type to automatically serialize/deserialize JSON."""
+    impl = Text
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        return json.dumps(value)  # Serialize to JSON string
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return json.loads(value)  # Deserialize to Python dict
+
 
 class Sensor(Base):
     __tablename__ = "sensors"
@@ -13,6 +31,7 @@ class Sensor(Base):
 
     values = relationship("SensorValue", back_populates="sensor", cascade="all, delete-orphan")
 
+
 class SensorValue(Base):
     __tablename__ = "sensor_values"
 
@@ -20,6 +39,6 @@ class SensorValue(Base):
     sensor_id = Column(Integer, ForeignKey("sensors.id"), nullable=False)
     recorded_at = Column(DateTime, default=datetime.datetime.utcnow)  # Fully qualified name
     value = Column(Float, nullable=False)
-    extra_metadata = Column(Text, nullable=True)
+    extra_metadata = Column(JSONEncodedDict, nullable=True)
 
     sensor = relationship("Sensor", back_populates="values")

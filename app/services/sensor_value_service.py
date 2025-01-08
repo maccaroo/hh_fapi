@@ -7,7 +7,7 @@ def add_sensor_value(db: Session, value: SensorValueCreate) -> SensorValue:
         sensor_id=value.sensor_id,
         recorded_at=value.recorded_at,
         value=value.value,
-        metadata=value.metadata
+        extra_metadata=value.extra_metadata
     )
     db.add(db_value)
     db.commit()
