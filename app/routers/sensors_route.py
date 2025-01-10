@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.schemas.reading import Reading
-from app.schemas.sensor import Sensor, SensorCreate
+from app.schemas.sensor import Sensor, SensorCreate, SensorUpdate
 from app.services.reading_service import get_readings
-from app.services.sensor_service import create_sensor, delete_sensor_by_id, get_all_sensors, get_sensor_by_id
+from app.services.sensor_service import create_sensor, delete_sensor_by_id, get_all_sensors, get_sensor_by_id, update_sensor_by_id
 from app.utils.dependencies import get_db
 
 router = APIRouter()
@@ -37,6 +37,18 @@ def get_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Sensor not found")
     return sensor
 
+
+@router.put("/{sensor_id}", response_model=Sensor, status_code=status.HTTP_202_ACCEPTED)
+def update_sensor_endpoint(sensor_id: int, sensor: SensorUpdate, db: Session = Depends(get_db)):
+    """
+    Update a sensor.
+    """
+    updated_sensor = update_sensor_by_id(db, sensor_id, sensor)
+    if not updated_sensor:
+        raise HTTPException(status_code=404, detail="Sensor not found")
+    return updated_sensor
+
+
 @router.delete("/{sensor_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     """
@@ -55,4 +67,5 @@ def list_readings_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     """
     Get all readings for a sensor.
     """
-    return get_readings(db, sensor_id)
+    readings = get_readings(db, sensor_id)
+    return readings

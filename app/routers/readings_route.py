@@ -16,6 +16,7 @@ def add_reading_endpoint(value: ReadingCreate, db: Session = Depends(get_db)):
     """
     return add_reading(db, value)
 
+
 @router.get("/{reading_id}", response_model=Reading)
 def get_reading_endpoint(reading_id: int, db: Session = Depends(get_db)):
     """
@@ -25,6 +26,7 @@ def get_reading_endpoint(reading_id: int, db: Session = Depends(get_db)):
     if not reading:
         raise HTTPException(status_code=404, detail="Reading not found")
     return reading
+
 
 @router.delete("/{reading_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_reading_endpoint(reading_id: int, db: Session = Depends(get_db)):

@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.db.models import Reading
 from app.schemas.reading import ReadingCreate
 
+
 def add_reading(db: Session, value: ReadingCreate) -> Reading:
     """
     Add a reading.
@@ -17,17 +18,20 @@ def add_reading(db: Session, value: ReadingCreate) -> Reading:
     db.refresh(db_value)
     return db_value
 
+
 def get_readings(db: Session, sensor_id: int) -> list[Reading]:
     """
     Get readings for a sensor.
     """
     return db.query(Reading).filter(Reading.sensor_id == sensor_id).all()
 
+
 def get_reading_by_id(db: Session, reading_id: int) -> Reading | None:
     """
     Get a reading by id.
     """
     return db.query(Reading).filter(Reading.id == reading_id).first()
+
 
 def delete_reading_by_id(db: Session, reading_id: int) -> bool:
     """

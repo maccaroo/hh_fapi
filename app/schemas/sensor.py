@@ -10,6 +10,10 @@ class SensorBase(BaseModel):
 class SensorCreate(SensorBase):
     pass
 
+class SensorUpdate(SensorBase):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
 class Sensor(SensorBase):
     id: int
     created_at: datetime
