@@ -38,7 +38,7 @@ def get_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     return sensor
 
 
-@router.put("/{sensor_id}", response_model=Sensor, status_code=status.HTTP_202_ACCEPTED)
+@router.put("/{sensor_id}", response_model=Sensor)
 def update_sensor_endpoint(sensor_id: int, sensor: SensorUpdate, db: Session = Depends(get_db)):
     """
     Update a sensor.
