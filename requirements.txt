@@ -3,3 +3,5 @@ uvicorn
 sqlalchemy
 databases
 aiosqlite
+python-dotenv
+psycopg[binary]
