@@ -68,7 +68,7 @@ In order to keep the service running, we can use `systemd`:
 
 Create a service file:
 ```bash
-sudo nano /etc/systemd/system/fastapi.service
+sudo nano /etc/systemd/system/home_historian.service
 ```
 Enter the following content:
 ```
@@ -88,8 +88,14 @@ WantedBy=multi-user.target
 Reload systemd, enable and start the service:
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable fastapi.service
-sudo systemctl start fastapi.service
+sudo systemctl enable home_historian.service
+sudo systemctl start home_historian.service
+```
+If later you need to reload the config or service, use the following:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart home_historian.service
+sudo systemctl status home_historian.service
 ```
 
 # Setup Postgres
