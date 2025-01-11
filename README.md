@@ -134,3 +134,17 @@ List the schemas:
 ```sql
 \dn
 ```
+
+I use the application-specific user `hh_user` to access the database (instead of the default user `postgres`).  This is more secure, but I've run into issues with database objects which were created with the `postgres` user.  Since access is limited to the schema `hh`, you can run the following script to grant access to `hh_user` for objects it needs:
+```sql
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA hh TO hh_user;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA hh TO hh_user;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA hh TO hh_user;
+```
+You can run the following script to ensure that `hh_user` gets the necessary privileges for new objects:
+```sql
+ALTER DEFAULT PRIVILEGES IN SCHEMA hh GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO hh_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA hh GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO hh_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA hh GRANT EXECUTE ON FUNCTIONS TO hh_user;
+GRANT USAGE, CREATE ON SCHEMA hh TO hh_user;
+```
