@@ -3,16 +3,11 @@ from app.db.models import Reading
 from app.schemas.reading import ReadingCreate
 
 
-def add_reading(db: Session, value: ReadingCreate) -> Reading:
+def add_reading(db: Session, reading: ReadingCreate) -> Reading:
     """
     Add a reading.
     """
-    db_value = Reading(
-        sensor_id=value.sensor_id,
-        recorded_at=value.recorded_at,
-        value=value.value,
-        extra_metadata=value.extra_metadata
-    )
+    db_value = Reading(**reading.model_dump())
     db.add(db_value)
     db.commit()
     db.refresh(db_value)

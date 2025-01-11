@@ -7,7 +7,7 @@ def create_sensor(db: Session, sensor: SensorCreate) -> Sensor:
     """
     Create a sensor.
     """
-    db_sensor = Sensor(name=sensor.name, description=sensor.description)
+    db_sensor = Sensor(**sensor.model_dump())
     db.add(db_sensor)
     db.commit()
     db.refresh(db_sensor)
