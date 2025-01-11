@@ -23,6 +23,7 @@ class JSONEncodedDict(TypeDecorator):
 
 class Sensor(Base):
     __tablename__ = "sensor"
+    __table_args__ = {"schema": "hh"}
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
@@ -34,9 +35,10 @@ class Sensor(Base):
 
 class Reading(Base):
     __tablename__ = "reading"
+    __table_args__ = {"schema": "hh"}
 
     id = Column(Integer, primary_key=True, index=True)
-    sensor_id = Column(Integer, ForeignKey("sensor.id"), nullable=False)
+    sensor_id = Column(Integer, ForeignKey("hh.sensor.id"), nullable=False)
     recorded_at = Column(DateTime, default=datetime.datetime.utcnow)  # Fully qualified name
     value = Column(Float, nullable=False)
     extra_metadata = Column(JSONEncodedDict, nullable=True)
