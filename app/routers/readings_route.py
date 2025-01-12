@@ -10,11 +10,12 @@ router = APIRouter()
 ### Readings endpoints
 
 @router.post("/", response_model=reading_schema.ReadingResponse, status_code=status.HTTP_201_CREATED)
-def add_reading_endpoint(value: reading_schema.ReadingCreate, db: Session = Depends(get_db)):
+def add_reading_endpoint(reading_create: reading_schema.ReadingCreate, db: Session = Depends(get_db)):
     """
     Create a reading.
     """
-    return reading_service.add_reading(db, value)
+    reading = reading_service.add_reading(db, reading_create)
+    return reading
 
 
 @router.get("/{reading_id}", response_model=reading_schema.ReadingResponse)

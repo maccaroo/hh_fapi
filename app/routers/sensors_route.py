@@ -12,11 +12,12 @@ router = APIRouter()
 ### Sensors endpoints
 
 @router.post("/", response_model=sensor_schema.SensorResponse, status_code=status.HTTP_201_CREATED)
-def create_sensor_endpoint(sensor: sensor_schema.SensorCreate, db: Session = Depends(get_db)):
+def create_sensor_endpoint(sensor_create: sensor_schema.SensorCreate, db: Session = Depends(get_db)):
     """
     Create a sensor.
     """
-    return sensor_service.create_sensor(db, sensor)
+    sensor = sensor_service.create_sensor(db, sensor_create)
+    return sensor
 
 
 @router.get("/", response_model=list[sensor_schema.SensorResponse])
@@ -24,7 +25,8 @@ def list_sensors_endpoint(db: Session = Depends(get_db)):
     """
     Get all sensors.
     """
-    return sensor_service.get_all_sensors(db)
+    sensors = sensor_service.get_all_sensors(db)
+    return sensors
 
 
 @router.get("/{sensor_id}", response_model=sensor_schema.SensorResponse)
@@ -39,11 +41,11 @@ def get_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{sensor_id}", response_model=sensor_schema.SensorResponse)
-def update_sensor_endpoint(sensor_id: int, sensor: sensor_schema.SensorUpdate, db: Session = Depends(get_db)):
+def update_sensor_endpoint(sensor_id: int, sensor_update: sensor_schema.SensorUpdate, db: Session = Depends(get_db)):
     """
     Update a sensor.
     """
-    updated_sensor = sensor_service.update_sensor_by_id(db, sensor_id, sensor)
+    updated_sensor = sensor_service.update_sensor_by_id(db, sensor_id, sensor_update)
     if not updated_sensor:
         raise HTTPException(status_code=404, detail="Sensor not found")
     return updated_sensor

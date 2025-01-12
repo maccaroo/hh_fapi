@@ -3,11 +3,11 @@ import app.db.models as models
 import app.schemas.sensor_schema as sensor_schema
 
 
-def create_sensor(db: Session, sensor: sensor_schema.SensorCreate) -> models.Sensor:
+def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate) -> models.Sensor:
     """
     Create a sensor.
     """
-    db_sensor = models.Sensor(**sensor.model_dump())
+    db_sensor = models.Sensor(**sensor_create.model_dump())
     db.add(db_sensor)
     db.commit()
     db.refresh(db_sensor)
@@ -28,15 +28,15 @@ def get_sensor_by_id(db: Session, sensor_id: int) -> models.Sensor | None:
     return db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()
 
 
-def update_sensor_by_id(db: Session, sensor_id: int, sensor: sensor_schema.SensorUpdate) -> models.Sensor | None:
+def update_sensor_by_id(db: Session, sensor_id: int, sensor_update: sensor_schema.SensorUpdate) -> models.Sensor | None:
     """
     Update a sensor by id.
     """
     db_sensor = get_sensor_by_id(db, sensor_id)
-    if not sensor:
+    if not db_sensor:
         return None
     
-    db.query(models.Sensor).filter(models.Sensor.id == sensor_id).update(sensor.model_dump())
+    db.query(models.Sensor).filter(models.Sensor.id == sensor_id).update(sensor_update.model_dump())
     db.commit()
     db.refresh(db_sensor)
     return db_sensor

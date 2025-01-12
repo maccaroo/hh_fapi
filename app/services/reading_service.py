@@ -3,11 +3,11 @@ import app.db.models as models
 import app.schemas.reading_schema as reading_schema
 
 
-def add_reading(db: Session, reading: reading_schema.ReadingCreate) -> models.Reading:
+def add_reading(db: Session, reading_create: reading_schema.ReadingCreate) -> models.Reading:
     """
     Add a reading.
     """
-    db_value = models.Reading(**reading.model_dump())
+    db_value = models.Reading(**reading_create.model_dump())
     db.add(db_value)
     db.commit()
     db.refresh(db_value)
