@@ -36,8 +36,7 @@ def update_sensor_by_id(db: Session, sensor_id: int, sensor: SensorUpdate) -> Se
     if not sensor:
         return None
     
-    db_sensor.name = sensor.name
-    db_sensor.description = sensor.description
+    db.query(Sensor).filter(Sensor.id == sensor_id).update(sensor.model_dump())
     db.commit()
     db.refresh(db_sensor)
     return db_sensor
