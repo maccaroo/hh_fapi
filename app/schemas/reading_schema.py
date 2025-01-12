@@ -11,7 +11,7 @@ class ReadingBase(BaseModel):
 class ReadingCreate(ReadingBase):
     sensor_id: int
 
-class Reading(ReadingBase):
+class ReadingResponse(ReadingBase):
     id: int
     sensor_id: int
 

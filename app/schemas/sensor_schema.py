@@ -14,7 +14,7 @@ class SensorUpdate(SensorBase):
     name: Optional[str] = None
     description: Optional[str] = None
 
-class Sensor(SensorBase):
+class SensorResponse(SensorBase):
     id: int
     created_at: datetime
 

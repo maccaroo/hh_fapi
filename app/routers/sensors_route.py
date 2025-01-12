@@ -11,7 +11,7 @@ router = APIRouter()
 
 ### Sensors endpoints
 
-@router.post("/", response_model=sensor_schema.Sensor, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=sensor_schema.SensorResponse, status_code=status.HTTP_201_CREATED)
 def create_sensor_endpoint(sensor: sensor_schema.SensorCreate, db: Session = Depends(get_db)):
     """
     Create a sensor.
@@ -19,7 +19,7 @@ def create_sensor_endpoint(sensor: sensor_schema.SensorCreate, db: Session = Dep
     return sensor_service.create_sensor(db, sensor)
 
 
-@router.get("/", response_model=list[sensor_schema.Sensor])
+@router.get("/", response_model=list[sensor_schema.SensorResponse])
 def list_sensors_endpoint(db: Session = Depends(get_db)):
     """
     Get all sensors.
@@ -27,7 +27,7 @@ def list_sensors_endpoint(db: Session = Depends(get_db)):
     return sensor_service.get_all_sensors(db)
 
 
-@router.get("/{sensor_id}", response_model=sensor_schema.Sensor)
+@router.get("/{sensor_id}", response_model=sensor_schema.SensorResponse)
 def get_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     """
     Get a sensor.
@@ -38,7 +38,7 @@ def get_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     return sensor
 
 
-@router.put("/{sensor_id}", response_model=sensor_schema.Sensor)
+@router.put("/{sensor_id}", response_model=sensor_schema.SensorResponse)
 def update_sensor_endpoint(sensor_id: int, sensor: sensor_schema.SensorUpdate, db: Session = Depends(get_db)):
     """
     Update a sensor.
@@ -62,7 +62,7 @@ def delete_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
 
 ### Readings endpoints
 
-@router.get("/{sensor_id}/readings", response_model=list[reading_schema.Reading])
+@router.get("/{sensor_id}/readings", response_model=list[reading_schema.ReadingResponse])
 def list_readings_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     """
     Get all readings for a sensor.

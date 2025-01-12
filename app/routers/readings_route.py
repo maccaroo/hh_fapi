@@ -9,7 +9,7 @@ router = APIRouter()
 
 ### Readings endpoints
 
-@router.post("/", response_model=reading_schema.Reading, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=reading_schema.ReadingResponse, status_code=status.HTTP_201_CREATED)
 def add_reading_endpoint(value: reading_schema.ReadingCreate, db: Session = Depends(get_db)):
     """
     Create a reading.
@@ -17,7 +17,7 @@ def add_reading_endpoint(value: reading_schema.ReadingCreate, db: Session = Depe
     return reading_service.add_reading(db, value)
 
 
-@router.get("/{reading_id}", response_model=reading_schema.Reading)
+@router.get("/{reading_id}", response_model=reading_schema.ReadingResponse)
 def get_reading_endpoint(reading_id: int, db: Session = Depends(get_db)):
     """
     Get a reading.
