@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.reading import Reading, ReadingCreate
-from app.services.reading_service import add_reading, delete_reading_by_id, get_reading_by_id, get_readings
+import app.schemas.reading_schema as reading_schema
+import app.services.reading_service as reading_service
 from app.utils.dependencies import get_db
 
 router = APIRouter()
@@ -9,20 +9,20 @@ router = APIRouter()
 
 ### Readings endpoints
 
-@router.post("/", response_model=Reading, status_code=status.HTTP_201_CREATED)
-def add_reading_endpoint(value: ReadingCreate, db: Session = Depends(get_db)):
+@router.post("/", response_model=reading_schema.Reading, status_code=status.HTTP_201_CREATED)
+def add_reading_endpoint(value: reading_schema.ReadingCreate, db: Session = Depends(get_db)):
     """
     Create a reading.
     """
-    return add_reading(db, value)
+    return reading_service.add_reading(db, value)
 
 
-@router.get("/{reading_id}", response_model=Reading)
+@router.get("/{reading_id}", response_model=reading_schema.Reading)
 def get_reading_endpoint(reading_id: int, db: Session = Depends(get_db)):
     """
     Get a reading.
     """
-    reading = get_reading_by_id(db, reading_id)
+    reading = reading_service.get_reading_by_id(db, reading_id)
     if not reading:
         raise HTTPException(status_code=404, detail="Reading not found")
     return reading
@@ -33,7 +33,7 @@ def delete_reading_endpoint(reading_id: int, db: Session = Depends(get_db)):
     """
     Delete a reading.
     """
-    success = delete_reading_by_id(db, reading_id)
+    success = reading_service.delete_reading_by_id(db, reading_id)
     if not success:
         raise HTTPException(status_code=404, detail="Reading not found")
     return
