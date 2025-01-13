@@ -4,7 +4,7 @@ import app.schemas.user_schema as user_schema
 from app.services import user_service
 from app.utils.dependencies import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/", response_model=user_schema.UserResponse, status_code=status.HTTP_201_CREATED)

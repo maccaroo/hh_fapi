@@ -6,7 +6,7 @@ import app.services.sensor_service as sensor_service
 import app.services.reading_service as reading_service
 from app.utils.dependencies import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/sensors", tags=["Sensors"])
 
 
 ### Sensors endpoints

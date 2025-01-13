@@ -4,7 +4,7 @@ import app.schemas.reading_schema as reading_schema
 import app.services.reading_service as reading_service
 from app.utils.dependencies import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/readings", tags=["Readings"])
 
 
 ### Readings endpoints

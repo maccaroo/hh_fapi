@@ -9,6 +9,6 @@ app = FastAPI()
 
 # Include routers
 app.include_router(root_route.router)
-app.include_router(sensors_route.router, prefix="/sensors", tags=["Sensors"])
-app.include_router(readings_route.router, prefix="/readings", tags=["Readings"])
-app.include_router(users_route.router, prefix="/users", tags=["Users"])
+app.include_router(sensors_route.router)
+app.include_router(readings_route.router)
+app.include_router(users_route.router)

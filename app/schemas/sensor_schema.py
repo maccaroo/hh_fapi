@@ -11,7 +11,7 @@ class SensorCreate(SensorBase):
     pass
 
 class SensorUpdate(SensorBase):
-    name: Optional[str] = None
+    name: Optional[str]
     description: Optional[str] = None
 
 class SensorResponse(SensorBase):
