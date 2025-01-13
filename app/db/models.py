@@ -26,9 +26,10 @@ class Sensor(Base):
     __table_args__ = {"schema": "hh"}
 
     id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)  # Fully qualified name
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     readings = relationship("Reading", back_populates="sensor", cascade="all, delete-orphan")
 
@@ -38,9 +39,19 @@ class Reading(Base):
     __table_args__ = {"schema": "hh"}
 
     id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
     sensor_id = Column(Integer, ForeignKey("hh.sensor.id"), nullable=False)
-    recorded_at = Column(DateTime, default=datetime.datetime.utcnow)  # Fully qualified name
     value = Column(Float, nullable=False)
     extra_metadata = Column(JSONEncodedDict, nullable=True)
 
     sensor = relationship("Sensor", back_populates="readings")
+
+class User(Base):
+    __tablename__ = "user"
+    __table_args__ = {"schema": "hh"}
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    username = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)

@@ -5,3 +5,4 @@ databases
 aiosqlite
 python-dotenv
 psycopg[binary]
+passlib[bcrypt]
