@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.schemas import auth_schema
 from app.services import user_service
-from app.utils.dependencies import get_db
+from app.utils.database import get_db
 import app.utils.auth as auth_utils
 
 

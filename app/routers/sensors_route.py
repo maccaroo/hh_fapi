@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 import app.schemas.sensor_schema as sensor_schema
 import app.schemas.reading_schema as reading_schema
 import app.services.sensor_service as sensor_service
 import app.services.reading_service as reading_service
+from app.utils.auth import get_current_user
 from app.utils.dependencies import get_db
+
 
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
 
@@ -12,11 +15,11 @@ router = APIRouter(prefix="/sensors", tags=["Sensors"])
 ### Sensors endpoints
 
 @router.post("/", response_model=sensor_schema.SensorResponse, status_code=status.HTTP_201_CREATED)
-def create_sensor_endpoint(sensor_create: sensor_schema.SensorCreate, db: Session = Depends(get_db)):
+def create_sensor_endpoint(sensor_create: sensor_schema.SensorCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     """
     Create a sensor.
     """
-    sensor = sensor_service.create_sensor(db, sensor_create)
+    sensor = sensor_service.create_sensor(db, sensor_create, current_user.id)
     return sensor
 
 

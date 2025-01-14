@@ -1,13 +1,16 @@
 from sqlalchemy.orm import Session
+
 import app.db.models as models
 import app.schemas.sensor_schema as sensor_schema
 
 
-def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate) -> models.Sensor:
+def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_id: int) -> models.Sensor:
     """
     Create a sensor.
     """
     db_sensor = models.Sensor(**sensor_create.model_dump())
+    db_sensor.created_by = user_id
+
     db.add(db_sensor)
     db.commit()
     db.refresh(db_sensor)

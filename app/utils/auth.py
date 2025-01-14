@@ -5,6 +5,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt, JWTError
+from sqlalchemy.orm import Session
+
+from app.services import user_service
+from app.utils.database import get_db
 
 load_dotenv()
 
@@ -60,7 +64,7 @@ def verify_access_token(token: str, credentials_exception):
     return token_data
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """
     Get the current user.
     """
@@ -69,4 +73,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    return verify_access_token(token, credentials_exception)
+    token_data = verify_access_token(token, credentials_exception)
+
+    user = user_service.get_user_by_id(db, token_data["id"])
+    return user

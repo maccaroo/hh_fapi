@@ -3,6 +3,7 @@ import json
 from sqlalchemy import Column, Integer, String, Text, DateTime, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
+
 from app.db.base import Base
 
 
@@ -27,6 +28,8 @@ class Sensor(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    created_by = Column(Integer, ForeignKey("hh.user.id"), nullable=False)
+
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
