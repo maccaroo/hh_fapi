@@ -9,7 +9,7 @@ def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_i
     Create a sensor.
     """
     db_sensor = models.Sensor(**sensor_create.model_dump())
-    db_sensor.created_by = user_id
+    db_sensor.created_by_user_id = user_id
 
     db.add(db_sensor)
     db.commit()

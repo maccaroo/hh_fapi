@@ -28,11 +28,9 @@ class Sensor(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
-    created_by = Column(Integer, ForeignKey("hh.user.id"), nullable=False)
-
+    created_by_user_id = Column(Integer, ForeignKey("hh.user.id"), nullable=False)
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     readings = relationship("Reading", back_populates="sensor", cascade="all, delete-orphan")
 
