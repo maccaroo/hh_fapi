@@ -1,9 +1,10 @@
 import os
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.db.base import Base
 from dotenv import load_dotenv
+
+from app.db.base import Base
+
 
 # Load environment variables from .env
 load_dotenv()

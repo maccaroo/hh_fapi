@@ -6,7 +6,7 @@ import app.schemas.reading_schema as reading_schema
 import app.services.sensor_service as sensor_service
 import app.services.reading_service as reading_service
 from app.utils.auth import get_current_user
-from app.utils.dependencies import get_db
+from app.utils.database import get_db
 
 
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
