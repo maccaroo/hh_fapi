@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 import app.db.models as models
 import app.schemas.sensor_schema as sensor_schema
+from app.services.exceptions import IntegrityConstraintViolationException
 
 
 def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_id: int) -> models.Sensor:
@@ -11,9 +13,14 @@ def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_i
     db_sensor = models.Sensor(**sensor_create.model_dump())
     db_sensor.created_by_user_id = user_id
 
-    db.add(db_sensor)
-    db.commit()
-    db.refresh(db_sensor)
+    try:
+        db.add(db_sensor)
+        db.commit()
+        db.refresh(db_sensor)
+    except IntegrityError:
+        db.rollback()
+        raise IntegrityConstraintViolationException("Sensor already exists")
+    
     return db_sensor
 
 
@@ -39,9 +46,14 @@ def update_sensor_by_id(db: Session, sensor_id: int, sensor_update: sensor_schem
     if not db_sensor:
         return None
     
-    db.query(models.Sensor).filter(models.Sensor.id == sensor_id).update(sensor_update.model_dump())
-    db.commit()
-    db.refresh(db_sensor)
+    try:
+        db.query(models.Sensor).filter(models.Sensor.id == sensor_id).update(sensor_update.model_dump())
+        db.commit()
+        db.refresh(db_sensor)
+    except IntegrityError:
+        db.rollback()
+        raise IntegrityConstraintViolationException("Cannot update sensor")
+
     return db_sensor
 
 

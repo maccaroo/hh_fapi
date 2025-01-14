@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 import app.schemas.sensor_schema as sensor_schema
 import app.schemas.reading_schema as reading_schema
+from app.services.exceptions import IntegrityConstraintViolationException
 import app.services.sensor_service as sensor_service
 import app.services.reading_service as reading_service
 from app.utils.auth import get_current_user
@@ -19,7 +20,10 @@ def create_sensor_endpoint(sensor_create: sensor_schema.SensorCreate, db: Sessio
     """
     Create a sensor.
     """
-    sensor = sensor_service.create_sensor(db, sensor_create, current_user.id)
+    try:
+        sensor = sensor_service.create_sensor(db, sensor_create, current_user.id)
+    except IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     return sensor
 
 
@@ -48,7 +52,11 @@ def update_sensor_endpoint(sensor_id: int, sensor_update: sensor_schema.SensorUp
     """
     Update a sensor.
     """
-    updated_sensor = sensor_service.update_sensor_by_id(db, sensor_id, sensor_update)
+    try:
+        updated_sensor = sensor_service.update_sensor_by_id(db, sensor_id, sensor_update)
+    except IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    
     if not updated_sensor:
         raise HTTPException(status_code=404, detail="Sensor not found")
     return updated_sensor

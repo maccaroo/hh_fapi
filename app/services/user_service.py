@@ -1,8 +1,10 @@
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 import app.db.models as models
 import app.schemas.user_schema as user_schema
+from app.services.exceptions import IntegrityConstraintViolationException
 from app.utils.auth import hash_password
 
 
@@ -14,9 +16,15 @@ def create_user(db: Session, user_create: user_schema.UserCreate) -> models.User
     user_create.password = hashed_password
 
     db_user = models.User(**user_create.model_dump())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+
+    try:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+    except IntegrityError:
+        db.rollback()
+        raise IntegrityConstraintViolationException("User already exists")
+
     return db_user
 
 

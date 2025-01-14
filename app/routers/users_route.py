@@ -14,7 +14,11 @@ def create_user_endpoint(user_create: user_schema.UserCreate, db: Session = Depe
     """
     Create a user.
     """
-    user = user_service.create_user(db, user_create)
+    try:
+        user = user_service.create_user(db, user_create)
+    except user_service.IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    
     return user
 
 
