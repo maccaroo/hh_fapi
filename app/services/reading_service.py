@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 import app.db.models as models
 import app.schemas.reading_schema as reading_schema
+from app.services.exceptions import IntegrityConstraintViolationException
 
 
 def add_reading(db: Session, reading_create: reading_schema.ReadingCreate) -> models.Reading:
@@ -9,9 +11,15 @@ def add_reading(db: Session, reading_create: reading_schema.ReadingCreate) -> mo
     Add a reading.
     """
     db_value = models.Reading(**reading_create.model_dump())
-    db.add(db_value)
-    db.commit()
-    db.refresh(db_value)
+
+    try:
+        db.add(db_value)
+        db.commit()
+        db.refresh(db_value)
+    except IntegrityError:
+        db.rollback()
+        raise IntegrityConstraintViolationException("Cannot add reading")
+    
     return db_value
 
 

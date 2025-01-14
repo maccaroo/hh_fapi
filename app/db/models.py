@@ -28,11 +28,11 @@ class Sensor(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
-    created_by_user_id = Column(Integer, ForeignKey("hh.user.id"), nullable=False)
+    created_by_user_id = Column(Integer, ForeignKey("hh.user.id", ondelete="restrict"), nullable=False)
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
 
-    readings = relationship("Reading", back_populates="sensor", cascade="all, delete-orphan")
+    readings = relationship("Reading", back_populates="sensor")
 
 
 class Reading(Base):
@@ -41,7 +41,7 @@ class Reading(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
-    sensor_id = Column(Integer, ForeignKey("hh.sensor.id"), nullable=False)
+    sensor_id = Column(Integer, ForeignKey("hh.sensor.id", ondelete="RESTRICT"), nullable=False)
     value = Column(Float, nullable=False)
     extra_metadata = Column(JSONEncodedDict, nullable=True)
 

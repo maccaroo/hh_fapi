@@ -67,9 +67,13 @@ def delete_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     """
     Delete a sensor.
     """
-    success = sensor_service.delete_sensor_by_id(db, sensor_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Sensor not found")
+    try:
+        success = sensor_service.delete_sensor_by_id(db, sensor_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Sensor not found")
+    except IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    
     return
 
 
@@ -80,5 +84,9 @@ def list_readings_endpoint(sensor_id: int, db: Session = Depends(get_db)):
     """
     Get all readings for a sensor.
     """
+    sensor = sensor_service.get_sensor_by_id(db, sensor_id)
+    if not sensor:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor not found")
+    
     readings = reading_service.get_readings(db, sensor_id)
     return readings

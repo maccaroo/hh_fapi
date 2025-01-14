@@ -16,7 +16,11 @@ def add_reading_endpoint(reading_create: reading_schema.ReadingCreate, db: Sessi
     """
     Create a reading.
     """
-    reading = reading_service.add_reading(db, reading_create)
+    try:
+        reading = reading_service.add_reading(db, reading_create)
+    except reading_service.IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    
     return reading
 
 

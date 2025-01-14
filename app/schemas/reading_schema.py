@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class ReadingBase(BaseModel):
-    recorded_at: datetime = datetime.now(timezone.utc)
+    created_at: datetime = datetime.now(timezone.utc)
     value: float
     extra_metadata: Optional[Any] = None
 

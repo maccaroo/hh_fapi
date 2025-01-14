@@ -65,6 +65,11 @@ def delete_sensor_by_id(db: Session, sensor_id: int) -> bool:
     if not sensor:
         return False
     
-    db.delete(sensor)
-    db.commit()
+    try:
+        db.delete(sensor)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise IntegrityConstraintViolationException("Cannot delete sensor")
+    
     return True
