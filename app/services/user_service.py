@@ -1,7 +1,9 @@
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
+
 import app.db.models as models
 import app.schemas.user_schema as user_schema
-from app.utils.dependencies import hash_password
+from app.utils.auth import hash_password
 
 
 def create_user(db: Session, user_create: user_schema.UserCreate) -> models.User:
@@ -23,3 +25,10 @@ def get_user_by_id(db: Session, user_id: int) -> models.User | None:
     Get a user by id.
     """
     return db.query(models.User).filter(models.User.id == user_id).first()
+
+
+def get_user_by_email(db: Session, email: EmailStr) -> models.User | None:
+    """
+    Get a user by email.
+    """
+    return db.query(models.User).filter(models.User.email == email).first()
