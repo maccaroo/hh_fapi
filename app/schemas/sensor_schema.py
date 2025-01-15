@@ -17,6 +17,7 @@ class SensorUpdate(SensorBase):
 class SensorResponse(SensorBase):
     id: int
     created_at: datetime
+    created_by_user_id: int
 
     class Config:
         from_attributes = True
