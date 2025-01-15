@@ -4,10 +4,10 @@ from dataclasses import dataclass
 
 @dataclass
 class PaginationContext:
-    limit: int
-    offset: int
-    search: str
     db: Session
+    limit: int = 10
+    offset: int = 0
+    search: str = ""
 
 
 def paginate_query(query: Query, limit: int, offset: int):
