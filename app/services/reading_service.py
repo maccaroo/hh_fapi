@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 import app.db.models as models
 import app.schemas.reading_schema as reading_schema
 from app.services.exceptions import IntegrityConstraintViolationException
+from app.utils.pagination import PaginationContext, paginate_query
 
 
 def add_reading(db: Session, reading_create: reading_schema.ReadingCreate) -> models.Reading:
@@ -23,11 +24,14 @@ def add_reading(db: Session, reading_create: reading_schema.ReadingCreate) -> mo
     return db_value
 
 
-def get_readings(db: Session, sensor_id: int) -> list[models.Reading]:
+def get_readings(context: PaginationContext, sensor_id: int) -> list[models.Reading]:
     """
     Get readings for a sensor.
     """
-    return db.query(models.Reading).filter(models.Reading.sensor_id == sensor_id).all()
+    query = context.db.query(models.Reading).filter(models.Reading.sensor_id == sensor_id)
+    results = paginate_query(query, context.limit, context.offset)
+
+    return results
 
 
 def get_reading_by_id(db: Session, reading_id: int) -> models.Reading | None:

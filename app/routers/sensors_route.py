@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
+from app.schemas.pagination_schema import PaginatedResponse
 import app.schemas.sensor_schema as sensor_schema
 import app.schemas.reading_schema as reading_schema
 from app.services.exceptions import IntegrityConstraintViolationException
@@ -8,6 +9,7 @@ import app.services.sensor_service as sensor_service
 import app.services.reading_service as reading_service
 from app.utils.auth import get_current_user
 from app.utils.database import get_db
+from app.utils.pagination import PaginationContext
 
 
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
@@ -79,14 +81,20 @@ def delete_sensor_endpoint(sensor_id: int, db: Session = Depends(get_db)):
 
 ### Readings endpoints
 
-@router.get("/{sensor_id}/readings", response_model=list[reading_schema.ReadingResponse])
-def list_readings_endpoint(sensor_id: int, db: Session = Depends(get_db)):
+@router.get("/{sensor_id}/readings", response_model=PaginatedResponse[reading_schema.ReadingResponse])
+def list_readings_endpoint(
+    sensor_id: int, 
+    limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
+    offset: int = Query(0, ge=0, description="Number of records to skip"),
+    db: Session = Depends(get_db)):
     """
     Get all readings for a sensor.
     """
+    context = PaginationContext(limit=limit, offset=offset, db=db)
+
     sensor = sensor_service.get_sensor_by_id(db, sensor_id)
     if not sensor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor not found")
     
-    readings = reading_service.get_readings(db, sensor_id)
+    readings = reading_service.get_readings(context, sensor_id)
     return readings
