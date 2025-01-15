@@ -7,8 +7,8 @@ import app.schemas.reading_schema as reading_schema
 from app.services.exceptions import IntegrityConstraintViolationException
 import app.services.sensor_service as sensor_service
 import app.services.reading_service as reading_service
+from app.db.database import get_db
 from app.utils.auth import get_current_user
-from app.utils.database import get_db
 from app.utils.pagination import PaginationContext
 
 

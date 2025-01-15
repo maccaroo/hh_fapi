@@ -8,7 +8,7 @@ from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
 from app.services import user_service
-from app.utils.database import get_db
+from app.db.database import get_db
 
 load_dotenv()
 
