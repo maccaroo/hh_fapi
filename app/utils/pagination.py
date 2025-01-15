@@ -6,6 +6,7 @@ from dataclasses import dataclass
 class PaginationContext:
     limit: int
     offset: int
+    search: str
     db: Session
 
 

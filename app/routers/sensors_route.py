@@ -29,13 +29,20 @@ def create_sensor_endpoint(sensor_create: sensor_schema.SensorCreate, db: Sessio
     return sensor
 
 
-@router.get("/", response_model=list[sensor_schema.SensorResponse])
-def list_sensors_endpoint(db: Session = Depends(get_db)):
+@router.get("/", response_model=PaginatedResponse[sensor_schema.SensorResponse])
+def list_sensors_endpoint(
+    search: str = Query(None, description="Search by name"),
+    limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
+    offset: int = Query(0, ge=0, description="Number of records to skip"),
+    db: Session = Depends(get_db)
+    ):
     """
     Get all sensors.
     """
-    sensors = sensor_service.get_all_sensors(db)
-    return sensors
+    context = PaginationContext(limit=limit, offset=offset, search=search, db=db)
+    
+    paged_response = sensor_service.get_all_sensors(context)
+    return paged_response
 
 
 @router.get("/{sensor_id}", response_model=sensor_schema.SensorResponse)
@@ -96,5 +103,5 @@ def list_readings_endpoint(
     if not sensor:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sensor not found")
     
-    readings = reading_service.get_readings(context, sensor_id)
-    return readings
+    paged_response = reading_service.get_readings(context, sensor_id)
+    return paged_response

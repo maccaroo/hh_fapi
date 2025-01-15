@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 import app.db.models as models
 import app.schemas.sensor_schema as sensor_schema
 from app.services.exceptions import IntegrityConstraintViolationException
+from app.utils.pagination import PaginationContext, paginate_query
 
 
 def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_id: int) -> models.Sensor:
@@ -24,11 +25,18 @@ def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_i
     return db_sensor
 
 
-def get_all_sensors(db: Session) -> list[models.Sensor]:
+def get_all_sensors(context: PaginationContext) -> list[models.Sensor]:
     """
     Get all sensors.
     """
-    return db.query(models.Sensor).all()
+    query = context.db.query(models.Sensor)
+
+    if context.search:
+        query = query.filter(models.Sensor.name.contains(context.search))
+
+    results = paginate_query(query, context.limit, context.offset)
+
+    return results
 
 
 def get_sensor_by_id(db: Session, sensor_id: int) -> models.Sensor | None:
