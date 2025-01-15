@@ -33,6 +33,7 @@ class Sensor(Base):
     description = Column(Text, nullable=True)
 
     readings = relationship("Reading", back_populates="sensor")
+    created_by_user = relationship("User", back_populates="sensors")
 
 
 class Reading(Base):
@@ -56,3 +57,5 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+
+    sensors = relationship("Sensor", back_populates="created_by_user")
