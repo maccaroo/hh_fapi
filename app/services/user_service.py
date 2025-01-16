@@ -6,6 +6,7 @@ import app.db.models as models
 import app.schemas.user_schema as user_schema
 from app.services.exceptions import IntegrityConstraintViolationException
 from app.utils.auth import hash_password
+from app.utils.pagination import PaginationContext, paginate_query
 
 
 def create_user(db: Session, user_create: user_schema.UserCreate) -> models.User:
@@ -26,6 +27,20 @@ def create_user(db: Session, user_create: user_schema.UserCreate) -> models.User
         raise IntegrityConstraintViolationException("User already exists")
 
     return db_user
+
+
+def get_all_users(context: PaginationContext) -> list[models.User]:
+    """
+    Get all users.
+    """
+    query = context.db.query(models.User)
+
+    if context.search:
+        query = query.filter(models.User.username.contains(context.search))
+
+    results = paginate_query(query, context.limit, context.offset)
+
+    return results
 
 
 def get_user_by_id(db: Session, user_id: int) -> models.User | None:
