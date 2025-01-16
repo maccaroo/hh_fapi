@@ -8,7 +8,7 @@ from app.services.exceptions import IntegrityConstraintViolationException
 from app.utils.pagination import PaginationContext, paginate_query
 
 
-def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_id: int) -> models.Sensor:
+def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_id: int) -> sensor_schema.SensorResponse:
     """
     Create a sensor.
     """
@@ -40,14 +40,14 @@ def get_all_sensors(context: PaginationContext) -> PaginatedResponse[sensor_sche
     return results
 
 
-def get_sensor_by_id(db: Session, sensor_id: int) -> models.Sensor | None:
+def get_sensor_by_id(db: Session, sensor_id: int) -> sensor_schema.SensorResponse | None:
     """
     Get a sensor by id.
     """
     return db.query(models.Sensor).filter(models.Sensor.id == sensor_id).first()
 
 
-def update_sensor_by_id(db: Session, sensor_id: int, sensor_update: sensor_schema.SensorUpdate) -> models.Sensor | None:
+def update_sensor_by_id(db: Session, sensor_id: int, sensor_update: sensor_schema.SensorUpdate) -> sensor_schema.SensorResponse | None:
     """
     Update a sensor by id.
     """

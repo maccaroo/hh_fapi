@@ -10,7 +10,7 @@ from app.utils.auth import hash_password
 from app.utils.pagination import PaginationContext, paginate_query
 
 
-def create_user(db: Session, user_create: user_schema.UserCreate) -> models.User:
+def create_user(db: Session, user_create: user_schema.UserCreate) -> user_schema.UserResponse:
     """
     Create a user.
     """
@@ -44,14 +44,14 @@ def get_all_users(context: PaginationContext) -> PaginatedResponse[user_schema.U
     return results
 
 
-def get_user_by_id(db: Session, user_id: int) -> models.User | None:
+def get_user_by_id(db: Session, user_id: int) -> user_schema.UserResponse | None:
     """
     Get a user by id.
     """
     return db.query(models.User).filter(models.User.id == user_id).first()
 
 
-def get_user_by_email(db: Session, email: EmailStr) -> models.User | None:
+def get_user_by_email(db: Session, email: EmailStr) -> user_schema.UserResponse | None:
     """
     Get a user by email.
     """
