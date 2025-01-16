@@ -7,7 +7,7 @@ class MetadataBase(BaseModel):
 
 
 class MetadataCreate(MetadataBase):
-    type: str
+    data_type: str
 
 
 class MetadataUpdate(MetadataBase):
@@ -15,7 +15,7 @@ class MetadataUpdate(MetadataBase):
 
 class MetadataResponse(MetadataBase):
     id: int
-    type: str
+    data_type: str
 
     class Config:
         from_attributes = True

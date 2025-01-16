@@ -1,6 +1,6 @@
 import datetime
 import json
-from sqlalchemy import Integer, String, Text, DateTime, Float, Column, ForeignKey, CheckConstraint
+from sqlalchemy import JSON, Integer, String, Text, DateTime, Float, Column, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
@@ -61,13 +61,15 @@ class User(Base):
     sensors = relationship("Sensor", back_populates="created_by_user")
 
 
+metadata_data_types = ["string", "integer", "float", "datetime"]
+
 class Metadata(Base):
     __tablename__ = "metadata"
     __table_args__ = (
-        CheckConstraint("type IN ('string', 'integer', 'float', 'datetime', 'list')", name="check_metadata_type"),
+        CheckConstraint(f"data_type IN ({','.join(['\'' + _dt + '\'' for _dt in metadata_data_types])})", name="check_metadata_data_type"),
         {"schema": "hh"},
     )
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
-    type = Column(String, nullable=False)
+    data_type = Column(String, nullable=False)

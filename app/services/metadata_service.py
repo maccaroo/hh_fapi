@@ -23,7 +23,7 @@ def create_metadata(db: Session, metadata_create: metadata_schema.MetadataCreate
         if "UNIQUE constraint failed:" in str(ex):
             raise IntegrityConstraintViolationException("Metadata already exists")
         elif "check_metadata_type" in str(ex):
-            raise IntegrityConstraintViolationException(f"Invalid value for 'type': {metadata_create.type}")
+            raise IntegrityConstraintViolationException(f"Invalid value for 'data_type': {metadata_create.data_type}")
         else:
             raise IntegrityConstraintViolationException("Cannot create metadata")
     
