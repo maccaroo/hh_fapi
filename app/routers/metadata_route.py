@@ -72,7 +72,10 @@ def delete_metadata_endpoint(metadata_id: int, db: Session = Depends(get_db)):
     """
     Delete a metadata.
     """
-    success = metadata_service.delete_metadata_by_id(db, metadata_id)
-    if not success: 
-        raise HTTPException(status_code=404, detail="Metadata not found")
+    try:
+        success = metadata_service.delete_metadata_by_id(db, metadata_id)
+        if not success: 
+            raise HTTPException(status_code=404, detail="Metadata not found")
+    except metadata_service.IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     return
