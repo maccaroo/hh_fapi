@@ -3,7 +3,7 @@ uvicorn
 sqlalchemy
 databases
 aiosqlite
-python-dotenv
 psycopg[binary]
 passlib[bcrypt]
 python-jose[cryptography]
+bcrypt<4.0
