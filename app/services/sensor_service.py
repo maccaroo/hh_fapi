@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 import app.db.models as models
+from app.schemas.pagination_schema import PaginatedResponse
 import app.schemas.sensor_schema as sensor_schema
 from app.services.exceptions import IntegrityConstraintViolationException
 from app.utils.pagination import PaginationContext, paginate_query
@@ -25,7 +26,7 @@ def create_sensor(db: Session, sensor_create: sensor_schema.SensorCreate, user_i
     return db_sensor
 
 
-def get_all_sensors(context: PaginationContext) -> list[models.Sensor]:
+def get_all_sensors(context: PaginationContext) -> PaginatedResponse[sensor_schema.SensorResponse]:
     """
     Get all sensors.
     """

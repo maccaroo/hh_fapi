@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 import app.db.models as models
+from app.schemas.pagination_schema import PaginatedResponse
 import app.schemas.user_schema as user_schema
 from app.services.exceptions import IntegrityConstraintViolationException
 from app.utils.auth import hash_password
@@ -29,7 +30,7 @@ def create_user(db: Session, user_create: user_schema.UserCreate) -> models.User
     return db_user
 
 
-def get_all_users(context: PaginationContext) -> list[models.User]:
+def get_all_users(context: PaginationContext) -> PaginatedResponse[user_schema.UserResponse]:
     """
     Get all users.
     """
