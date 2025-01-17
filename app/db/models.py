@@ -62,11 +62,12 @@ class User(Base):
 
 
 metadata_data_types = ["string", "integer", "float", "datetime"]
+metadata_data_types_joined = ','.join(['\'' + _dt + '\'' for _dt in metadata_data_types])
 
 class Metadata(Base):
     __tablename__ = "metadata"
     __table_args__ = (
-        CheckConstraint(f"data_type IN ({','.join(['\'' + _dt + '\'' for _dt in metadata_data_types])})", name="check_metadata_data_type"),
+        CheckConstraint(f"data_type IN ({metadata_data_types_joined})", name="check_metadata_data_type"),
         {"schema": "hh"},
     )
 
