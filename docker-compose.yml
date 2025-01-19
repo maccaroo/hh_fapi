@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   hh-api:
-    image: hh-api
-    container_name: hh-api-container
+    image: hh-fapi
+    container_name: hh-fapi-container
     ports:
       - "8000:8000"
     environment:
