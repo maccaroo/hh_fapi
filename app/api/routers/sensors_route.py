@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
-from app.schemas.pagination_schema import PaginatedResponse
-import app.schemas.sensor_schema as sensor_schema
-import app.schemas.reading_schema as reading_schema
-from app.services.exceptions import IntegrityConstraintViolationException
-import app.services.sensor_service as sensor_service
-import app.services.reading_service as reading_service
-from app.db.database import get_db
+from app.api.schemas.pagination_schema import PaginatedResponse
+import app.api.schemas.sensor_schema as sensor_schema
+import app.api.schemas.reading_schema as reading_schema
+from app.logic.services.exceptions import IntegrityConstraintViolationException
+import app.logic.services.sensor_service as sensor_service
+import app.logic.services.reading_service as reading_service
+from app.persistence.db.database import get_db
 from app.utils.auth import get_current_user
 from app.utils.pagination import PaginationContext
 

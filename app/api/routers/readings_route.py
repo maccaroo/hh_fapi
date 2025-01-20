@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-import app.schemas.reading_schema as reading_schema
-import app.services.reading_service as reading_service
-from app.db.database import get_db
+import app.api.schemas.reading_schema as reading_schema
+import app.logic.services.reading_service as reading_service
+from app.persistence.db.database import get_db
 
 
 router = APIRouter(prefix="/readings", tags=["Readings"])

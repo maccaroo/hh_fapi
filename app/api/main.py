@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from app.routers import auth_route, readings_route, root_route, sensors_route, users_route, metadata_route
-from app.db.database import init_db
+from app.api.routers import auth_route, readings_route, root_route, sensors_route, users_route, metadata_route
+from app.persistence.db.database import init_db
 
 
 # Initialize database

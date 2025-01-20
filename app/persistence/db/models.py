@@ -4,7 +4,7 @@ from sqlalchemy import JSON, Integer, String, Text, DateTime, Float, Column, For
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator
 
-from app.db.base import Base
+from app.persistence.db.base import Base
 
 
 class JSONEncodedDict(TypeDecorator):
