@@ -34,6 +34,7 @@ class Sensor(Base):
 
     readings = relationship("Reading", back_populates="sensor")
     created_by_user = relationship("User", back_populates="sensors")
+    metadatas = relationship("SensorMetadata")
 
 
 class Reading(Base):
@@ -47,6 +48,7 @@ class Reading(Base):
     extra_metadata = Column(JSONEncodedDict, nullable=True)
 
     sensor = relationship("Sensor", back_populates="readings")
+
 
 class User(Base):
     __tablename__ = "user"
@@ -74,3 +76,20 @@ class Metadata(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
     data_type = Column(String, nullable=False)
+
+    metadatas = relationship("SensorMetadata", back_populates="parent_metadata")
+
+
+class SensorMetadata(Base):
+    __tablename__ = "sensor_metadata"
+    __table_args__ = {"schema": "hh"}
+
+    id = Column(Integer, primary_key=True, index=True)
+    sensor_id = Column(Integer, ForeignKey("hh.sensor.id", ondelete="RESTRICT"), nullable=False)
+    metadata_id = Column(Integer, ForeignKey("hh.metadata.id", ondelete="RESTRICT"), nullable=False)
+    value = Column(JSON, nullable=False)
+
+    sensor = relationship("Sensor", back_populates="metadatas")
+    parent_metadata = relationship("Metadata")
+
+    # TODO: Add validation for 'value' column.
