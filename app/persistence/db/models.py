@@ -70,7 +70,6 @@ class BaseWithToDict:
         return data
 
 
-
 class User(BaseWithToDict):
     __tablename__ = "user"
     __table_args__ = {"schema": "hh"}

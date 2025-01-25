@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from app.persistence.db.base import Base
-from app.config.settings import settings
+from app.core.app_config import settings
 
 
 # Build the DATABASE_URL
@@ -11,10 +11,6 @@ DATABASE_URL = f"postgresql+psycopg://{settings.POSTGRES_USER}:{settings.POSTGRE
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# # Ensure the schema exists
-# with engine.connect() as conn:
-#     conn.execute(text("CREATE SCHEMA IF NOT EXISTS hh"))
-#     conn.commit()
 
 def init_db():
     """

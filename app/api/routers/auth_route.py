@@ -3,7 +3,6 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.persistence.db.database import get_db
-from app.api.schemas import auth_schema
 from app.logic.services import user_service
 import app.utils.auth as auth_utils
 
