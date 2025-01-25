@@ -1,9 +1,11 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-from app.persistence.db.base import Base
-from app.core.app_config import settings
+from app.config.app_config import settings
 
+
+Base = declarative_base()
 
 # Build the DATABASE_URL
 DATABASE_URL = f"postgresql+psycopg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"

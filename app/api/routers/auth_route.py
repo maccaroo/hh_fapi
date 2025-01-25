@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.persistence.db.database import get_db
-from app.logic.services import user_service
+from app.persistence.database import get_db
+from app.core.services import user_service
 import app.utils.auth as auth_utils
 
 

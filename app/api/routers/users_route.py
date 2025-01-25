@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import user_schema
-from app.logic.services import user_service
-from app.persistence.db.database import get_db
+from app.core.services import user_service
+from app.persistence.database import get_db
 from app.utils.pagination import PaginationContext
 
 

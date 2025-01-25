@@ -5,9 +5,9 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from app.logic.services import user_service
-from app.persistence.db.database import get_db
-from app.core.app_config import settings
+from app.core.services import user_service
+from app.persistence.database import get_db
+from app.config.app_config import settings
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

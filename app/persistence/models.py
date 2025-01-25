@@ -1,11 +1,9 @@
 import datetime
 import json
 from sqlalchemy import JSON, Integer, String, Text, DateTime, Column, ForeignKey, CheckConstraint
-from sqlalchemy.orm import relationship, class_mapper, RelationshipProperty
+from sqlalchemy.orm import relationship, class_mapper
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-
-from app.persistence.db.base import Base
 
 
 class JSONEncodedDict(TypeDecorator):

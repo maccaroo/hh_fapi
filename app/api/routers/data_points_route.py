@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.schemas import data_point_schema
-from app.logic.services import data_point_service
-from app.persistence.db.database import get_db
+from app.core.services import data_point_service
+from app.persistence.database import get_db
 
 
 router = APIRouter(prefix="/data_points", tags=["Data Points"])

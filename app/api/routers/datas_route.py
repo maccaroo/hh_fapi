@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import data_meta_schema, data_point_schema, data_schema
-from app.logic.services.exceptions import IntegrityConstraintViolationException
-from app.logic.services import data_meta_service, data_point_service, data_service
-from app.persistence.db.database import get_db
+from app.core.services.exceptions import IntegrityConstraintViolationException
+from app.core.services import data_meta_service, data_point_service, data_service
+from app.persistence.database import get_db
 from app.utils.auth import get_current_user
 from app.utils.pagination import PaginationContext
 

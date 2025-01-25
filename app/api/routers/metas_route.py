@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.persistence.db.database import get_db
+from app.persistence.database import get_db
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.utils.auth import get_current_user
-from app.logic.services import meta_service
+from app.core.services import meta_service
 from app.api.schemas import meta_schema
 from app.utils.pagination import PaginationContext
 

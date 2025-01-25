@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from app.persistence.db import models
+from app.persistence import models
 from app.api.schemas import data_point_schema
-from app.logic.services.exceptions import IntegrityConstraintViolationException
+from app.core.services.exceptions import IntegrityConstraintViolationException
 from app.utils.pagination import PaginationContext, paginate_query
 
 
