@@ -7,7 +7,12 @@ The API layer for the Home Historian system, implemented in FastAPI.
 This project is being used to learn FastAPI, and API design patterns.
 
 # What does it do?
-Home Historian is a system for the collection of time-series data from around the home.  Initially the schema contains only sensors and their readings.
+Home Historian is a system for the collection of time-series data from around the home.  The schema contains the following tables:
+* User - Users of the system
+* Data - Some items of data to be tracked.
+* DataPoint - Points for some `Data`.
+* Meta - Metadata information.
+* DataMeta - `Meta` information for some `Data`.
 
 # What requirements are there?
 Your system must have Python 3 installed, as well as a database.  The implementation uses Postgres, but you can swap that out to use SqLite3 or some other database if you like.

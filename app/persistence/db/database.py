@@ -11,16 +11,18 @@ DATABASE_URL = f"postgresql+psycopg://{settings.POSTGRES_USER}:{settings.POSTGRE
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Ensure the schema exists
-with engine.connect() as conn:
-    conn.execute(text("CREATE SCHEMA IF NOT EXISTS hh"))
-    conn.commit()
+# # Ensure the schema exists
+# with engine.connect() as conn:
+#     conn.execute(text("CREATE SCHEMA IF NOT EXISTS hh"))
+#     conn.commit()
 
 def init_db():
     """
     Initialize the database.
     """
     Base.metadata.create_all(bind=engine)
+
+    # TODO: Create default admin user
 
 
 def get_db():

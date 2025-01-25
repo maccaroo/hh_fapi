@@ -2,9 +2,9 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-import app.persistence.db.models as models
+from app.persistence.db import models
 from app.api.schemas.pagination_schema import PaginatedResponse
-import app.api.schemas.user_schema as user_schema
+from app.api.schemas import user_schema
 from app.logic.services.exceptions import IntegrityConstraintViolationException
 from app.utils.auth import hash_password
 from app.utils.pagination import PaginationContext, paginate_query

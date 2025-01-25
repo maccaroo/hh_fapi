@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.schemas.pagination_schema import PaginatedResponse
-import app.api.schemas.user_schema as user_schema
+from app.api.schemas import user_schema
 from app.logic.services import user_service
 from app.persistence.db.database import get_db
 from app.utils.pagination import PaginationContext
@@ -25,7 +25,7 @@ def create_user_endpoint(user_create: user_schema.UserCreate, db: Session = Depe
 
 
 @router.get("/", response_model=PaginatedResponse[user_schema.UserResponse])
-def get_user_endpoint(
+def list_users_endpoint(
     search: str = Query(None, description="Search by name"),
     limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
     offset: int = Query(0, ge=0, description="Number of records to skip"),

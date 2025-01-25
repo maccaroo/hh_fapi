@@ -1,8 +1,9 @@
 import datetime
 import json
-from sqlalchemy import JSON, Integer, String, Text, DateTime, Float, Column, ForeignKey, CheckConstraint, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import JSON, Integer, String, Text, DateTime, Column, ForeignKey, CheckConstraint
+from sqlalchemy.orm import relationship, class_mapper, RelationshipProperty
 from sqlalchemy.types import TypeDecorator
+from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 from app.persistence.db.base import Base
 
@@ -22,35 +23,55 @@ class JSONEncodedDict(TypeDecorator):
         return json.loads(value)  # Deserialize to Python dict
 
 
-class Sensor(Base):
-    __tablename__ = "sensor"
-    __table_args__ = {"schema": "hh"}
+@as_declarative()
+class BaseWithToDict:
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
 
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
-    created_by_user_id = Column(Integer, ForeignKey("hh.user.id", ondelete="restrict"), nullable=False)
-    name = Column(String, unique=True, nullable=False)
-    description = Column(Text, nullable=True)
+    def to_dict(self, include_relationships=True, include_columns=True, visited=None):
+        """
+        Convert the SQLAlchemy object to a dictionary, including relationships.
+        
+        Args:
+            include_relationships (bool): Whether to include related objects.
+            include_columns (bool): Whether to include direct columns.
+            visited (set): Tracks visited objects to avoid infinite recursion.
+        
+        Returns:
+            dict: The object represented as a dictionary.
+        """
+        if visited is None:
+            visited = set()
 
-    readings = relationship("Reading", back_populates="sensor")
-    created_by_user = relationship("User", back_populates="sensors")
-    metadatas = relationship("SensorMetadata")
+        # Avoid infinite recursion by skipping already visited objects
+        if self in visited:
+            return {}
+        visited.add(self)
+
+        data = {}
+
+        # Include column attributes
+        if include_columns:
+            for column in class_mapper(self.__class__).columns:
+                data[column.name] = getattr(self, column.name)
+
+        # Include relationships
+        if include_relationships:
+            for rel in class_mapper(self.__class__).relationships:
+                related_obj = getattr(self, rel.key)
+                if related_obj is None:
+                    data[rel.key] = None
+                elif isinstance(related_obj, list):  # Handle one-to-many or many-to-many
+                    data[rel.key] = [obj.to_dict(include_relationships, include_columns, visited) for obj in related_obj]
+                else:  # Handle one-to-one or many-to-one
+                    data[rel.key] = related_obj.to_dict(include_relationships, include_columns, visited)
+
+        return data
 
 
-class Reading(Base):
-    __tablename__ = "reading"
-    __table_args__ = {"schema": "hh"}
 
-    id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
-    sensor_id = Column(Integer, ForeignKey("hh.sensor.id", ondelete="RESTRICT"), nullable=False)
-    value = Column(Float, nullable=False)
-    extra_metadata = Column(JSONEncodedDict, nullable=True)
-
-    sensor = relationship("Sensor", back_populates="readings")
-
-
-class User(Base):
+class User(BaseWithToDict):
     __tablename__ = "user"
     __table_args__ = {"schema": "hh"}
 
@@ -60,36 +81,70 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
 
-    sensors = relationship("Sensor", back_populates="created_by_user")
+    datas = relationship("Data", back_populates="created_by_user")
 
 
-metadata_data_types = ["string", "integer", "float", "datetime"]
-metadata_data_types_joined = ','.join(['\'' + _dt + '\'' for _dt in metadata_data_types])
+data_types = ["string", "integer", "float", "datetime"]
+data_types_joined = ','.join(['\'' + _dt + '\'' for _dt in data_types])
 
-class Metadata(Base):
-    __tablename__ = "metadata"
+class Data(BaseWithToDict):
+    __tablename__ = "data"
     __table_args__ = (
-        CheckConstraint(f"data_type IN ({metadata_data_types_joined})", name="check_metadata_data_type"),
+        CheckConstraint(f"data_type IN ({data_types_joined})", name="check_data_type_value"),
+        {"schema": "hh"}
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    created_by_user_id = Column(Integer, ForeignKey("hh.user.id", ondelete="restrict"), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(Text, nullable=True)
+    data_type = Column(String, nullable=False)
+
+    data_points = relationship("DataPoint", back_populates="data")
+    created_by_user = relationship("User", back_populates="datas")
+    data_metas = relationship("DataMeta")
+
+
+class DataPoint(BaseWithToDict):
+    __tablename__ = "data_point"
+    __table_args__ = {"schema": "hh"}
+
+    id = Column(Integer, primary_key=True, index=True)
+    data_id = Column(Integer, ForeignKey("hh.data.id", ondelete="RESTRICT"), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
+    value = Column(JSON, nullable=False)
+
+    data = relationship("Data", back_populates="data_points")
+
+
+meta_types = ["string", "integer", "float", "datetime"]
+meta_types_joined = ','.join(['\'' + _dt + '\'' for _dt in meta_types])
+
+class Meta(BaseWithToDict):
+    __tablename__ = "meta"
+    __table_args__ = (
+        CheckConstraint(f"meta_type IN ({meta_types_joined})", name="check_meta_type_value"),
         {"schema": "hh"},
     )
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
-    data_type = Column(String, nullable=False)
+    meta_type = Column(String, nullable=False)
 
-    metadatas = relationship("SensorMetadata", back_populates="parent_metadata")
+    data_metas = relationship("DataMeta", back_populates="meta")
 
 
-class SensorMetadata(Base):
-    __tablename__ = "sensor_metadata"
+class DataMeta(BaseWithToDict):
+    __tablename__ = "data_meta"
     __table_args__ = {"schema": "hh"}
 
     id = Column(Integer, primary_key=True, index=True)
-    sensor_id = Column(Integer, ForeignKey("hh.sensor.id", ondelete="RESTRICT"), nullable=False)
-    metadata_id = Column(Integer, ForeignKey("hh.metadata.id", ondelete="RESTRICT"), nullable=False)
+    data_id = Column(Integer, ForeignKey("hh.data.id", ondelete="RESTRICT"), nullable=False)
+    meta_id = Column(Integer, ForeignKey("hh.meta.id", ondelete="RESTRICT"), nullable=False)
     value = Column(JSON, nullable=False)
 
-    sensor = relationship("Sensor", back_populates="metadatas")
-    parent_metadata = relationship("Metadata")
+    data = relationship("Data", back_populates="data_metas")
+    meta = relationship("Meta")
 
     # TODO: Add validation for 'value' column.

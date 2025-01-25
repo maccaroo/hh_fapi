@@ -1,21 +1,21 @@
 from pydantic import BaseModel, ConfigDict
 
 
-class MetadataBase(BaseModel):
+class MetaBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str
 
 
-class MetadataCreate(MetadataBase):
-    data_type: str
+class MetaCreate(MetaBase):
+    meta_type: str
 
 
-class MetadataUpdate(MetadataBase):
+class MetaUpdate(MetaBase):
     name: str
 
-class MetadataResponse(MetadataBase):
+class MetaResponse(MetaBase):
     id: int
-    data_type: str
+    meta_type: str
 
     class Config:
         from_attributes = True

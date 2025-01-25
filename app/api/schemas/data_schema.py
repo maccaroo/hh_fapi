@@ -9,21 +9,30 @@ class CreatedByUser(BaseModel):
     email: str
 
 
-class SensorBase(BaseModel):
+class MetaValue(BaseModel):
+    name: str
+    value: str
+
+
+class DataBase(BaseModel):
     name: str
     description: Optional[str] = None
 
-class SensorCreate(SensorBase):
-    pass
 
-class SensorUpdate(SensorBase):
+class DataCreate(DataBase):
+    data_type: str
+
+
+class DataUpdate(DataBase):
     name: Optional[str]
     description: Optional[str] = None
 
-class SensorResponse(SensorBase):
+
+class DataResponse(DataBase):
     id: int
     created_at: datetime
     created_by_user: CreatedByUser
+    data_type: str
 
     class Config:
         from_attributes = True
