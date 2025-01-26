@@ -1,54 +1,65 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from fastapi import Depends
 
-from app.persistence import models
+from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import data_point_schema
-from app.core.services.exceptions import IntegrityConstraintViolationException
-from app.utils.pagination import PaginationContext, paginate_query
+from app.persistence.repositories.data_point_repo import DataPointRepository, get_data_point_repo
+from app.utils.pagination import PaginationContext
 
 
-def add_data_point(db: Session, data_point_create: data_point_schema.DataPointCreate) -> models.DataPoint:
+def get_data_point_service(data_point_repo = Depends(get_data_point_repo)):
+    return DataPointService(data_point_repo)
+
+
+class DataPointService:
     """
-    Add a data point.
+    Data point service.
     """
-    db_data_point = models.DataPoint(**data_point_create.model_dump())
 
-    try:
-        db.add(db_data_point)
-        db.commit()
-        db.refresh(db_data_point)
-    except IntegrityError:
-        db.rollback()
-        raise IntegrityConstraintViolationException("Cannot add data point")
-    
-    return db_data_point
+    def __init__(
+            self, 
+            data_point_repo: DataPointRepository = Depends(get_data_point_repo)
+            ):
+        self.data_point_repo = data_point_repo
 
 
-def get_data_points(context: PaginationContext, data_id: int) -> list[models.DataPoint]:
-    """
-    Get data points for a data.
-    """
-    query = context.db.query(models.DataPoint).filter(models.DataPoint.data_id == data_id)
-    results = paginate_query(query, context.limit, context.offset)
+    def add_data_point(
+            self, 
+            data_point_create: data_point_schema.DataPointCreate
+            ) -> data_point_schema.DataPointResponse:
+        """
+        Add a data point.
+        """
+        created_data_point = self.data_point_repo.add_data_point(data_point_create)
 
-    return results
-
-
-def get_data_point_by_id(db: Session, data_point_id: int) -> models.DataPoint | None:
-    """
-    Get a data point by id.
-    """
-    return db.query(models.DataPoint).filter(models.DataPoint.id == data_point_id).first()
+        return created_data_point
 
 
-def delete_data_point_by_id(db: Session, data_point_id: int) -> bool:
-    """
-    Delete a data point by id.
-    """
-    db_data_point = get_data_point_by_id(db, data_point_id)
-    if not db_data_point:
-        return False
-    
-    db.delete(db_data_point)
-    db.commit()
-    return True
+    def get_data_points(
+            self, 
+            context: PaginationContext, 
+            data_id: int
+            ) -> PaginatedResponse[data_point_schema.DataPointResponse]:
+        """
+        Get data points for a data.
+        """
+        return self.data_point_repo.get_data_points(context, data_id)
+
+
+    def get_data_point_by_id(
+            self, 
+            data_point_id: int
+            ) -> data_point_schema.DataPointResponse | None:
+        """
+        Get a data point by id.
+        """
+        return self.data_point_repo.get_data_point_by_id(data_point_id)
+
+
+    def delete_data_point_by_id(
+            self, 
+            data_point_id: int
+            ) -> bool:
+        """
+        Delete a data point by id.
+        """
+        return self.data_point_repo.delete_data_point_by_id(data_point_id)

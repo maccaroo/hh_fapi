@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
 
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import user_schema
@@ -20,7 +19,7 @@ def create_user_endpoint(
     Create a user.
     """
     try:
-        user = user_service.create_user(user_create)
+        user = user_service.add_user(user_create)
     except IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
@@ -39,7 +38,7 @@ def list_users_endpoint(
     """
     context = PaginationContext(limit=limit, offset=offset, search=search)
 
-    paged_response = user_service.get_all_users(context)
+    paged_response = user_service.get_users(context)
 
     return paged_response
 

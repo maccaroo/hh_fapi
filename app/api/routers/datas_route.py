@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import data_meta_schema, data_point_schema, data_schema
 from app.core.services.exceptions import IntegrityConstraintViolationException
-from app.core.services import data_meta_service, data_point_service, data_service
+from app.core.services import data_meta_service, data_service
+from app.core.services.data_point_service import DataPointService, get_data_point_service
 from app.persistence.database import get_db
 from app.utils.auth import get_current_user
 from app.utils.pagination import PaginationContext
@@ -16,7 +17,11 @@ router = APIRouter(prefix="/datas", tags=["Datas"])
 ### Datas endpoints
 
 @router.post("/", response_model=data_schema.DataResponse, status_code=status.HTTP_201_CREATED)
-def create_data_endpoint(data_create: data_schema.DataCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+def create_data_endpoint(
+    data_create: data_schema.DataCreate, 
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(get_current_user)
+    ):
     """
     Create a data.
     """
@@ -44,7 +49,10 @@ def list_datas_endpoint(
 
 
 @router.get("/{data_id}", response_model=data_schema.DataResponse)
-def get_data_endpoint(data_id: int, db: Session = Depends(get_db)):
+def get_data_endpoint(
+    data_id: int, 
+    db: Session = Depends(get_db)
+    ):
     """
     Get a data.
     """
@@ -55,7 +63,11 @@ def get_data_endpoint(data_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{data_id}", response_model=data_schema.DataResponse)
-def update_data_endpoint(data_id: int, data_update: data_schema.DataUpdate, db: Session = Depends(get_db)):
+def update_data_endpoint(
+    data_id: int, 
+    data_update: data_schema.DataUpdate, 
+    db: Session = Depends(get_db)
+    ):
     """
     Update a data.
     """
@@ -70,7 +82,10 @@ def update_data_endpoint(data_id: int, data_update: data_schema.DataUpdate, db: 
 
 
 @router.delete("/{data_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_data_endpoint(data_id: int, db: Session = Depends(get_db)):
+def delete_data_endpoint(
+    data_id: int, 
+    db: Session = Depends(get_db)
+    ):
     """
     Delete a data.
     """
@@ -91,11 +106,13 @@ def list_data_points_endpoint(
     data_id: int, 
     limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
     offset: int = Query(0, ge=0, description="Number of records to skip"),
-    db: Session = Depends(get_db)):
+    data_point_service: DataPointService = Depends(get_data_point_service),
+    db: Session = Depends(get_db)
+    ):
     """
     Get all data points for a data.
     """
-    context = PaginationContext(limit=limit, offset=offset, db=db)
+    context = PaginationContext(limit=limit, offset=offset)
 
     data = data_service.get_data_by_id(db, data_id)
     if not data:
@@ -108,7 +125,11 @@ def list_data_points_endpoint(
 ### Meta endpoints
 
 @router.post("/{data_id}/metas/", response_model=data_meta_schema.DataMetaResponse, status_code=status.HTTP_201_CREATED)
-def create_data_meta_endpoint(data_id: int, data_meta_create: data_meta_schema.DataMetaCreate, db: Session = Depends(get_db)):
+def create_data_meta_endpoint(
+    data_id: int, 
+    data_meta_create: data_meta_schema.DataMetaCreate, 
+    db: Session = Depends(get_db)
+    ):
     """
     Create a data meta.
     """
@@ -128,7 +149,8 @@ def list_data_metas_endpoint(
     data_id: int, 
     limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
     offset: int = Query(0, ge=0, description="Number of records to skip"),
-    db: Session = Depends(get_db)):
+    db: Session = Depends(get_db)
+    ):
     """
     Get all data metas for a data.
     """
@@ -143,7 +165,11 @@ def list_data_metas_endpoint(
 
 
 @router.get("/{data_id}/metas/{meta_id}", response_model=data_meta_schema.DataMetaResponse)
-def get_data_meta_endpoint(data_id: int, meta_id: int, db: Session = Depends(get_db)):
+def get_data_meta_endpoint(
+    data_id: int, 
+    meta_id: int, 
+    db: Session = Depends(get_db)
+    ):
     """
     Get a data meta.
     """
@@ -154,7 +180,12 @@ def get_data_meta_endpoint(data_id: int, meta_id: int, db: Session = Depends(get
 
 
 @router.put("/{data_id}/metas/{meta_id}", response_model=data_meta_schema.DataMetaResponse)
-def update_data_meta_endpoint(data_id: int, meta_id: int, data_meta_update: data_meta_schema.DataMetaUpdate, db: Session = Depends(get_db)):
+def update_data_meta_endpoint(
+    data_id: int, 
+    meta_id: int, 
+    data_meta_update: data_meta_schema.DataMetaUpdate, 
+    db: Session = Depends(get_db)
+    ):
     """
     Update a data meta.
     """
@@ -174,7 +205,11 @@ def update_data_meta_endpoint(data_id: int, meta_id: int, data_meta_update: data
 
 
 @router.delete("/{data_id}/metas/{meta_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_data_meta_endpoint(data_id: int, meta_id: int, db: Session = Depends(get_db)):
+def delete_data_meta_endpoint(
+    data_id: int, 
+    meta_id: int, 
+    db: Session = Depends(get_db)
+    ):
     """
     Delete a data meta.
     """

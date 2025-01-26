@@ -19,13 +19,20 @@ class UserRepository:
     User repository.
     """
 
-    def __init__(self, db: Session):
+    def __init__(
+            self, db: Session
+            ):
         self.db = db
 
-    def create_user(self, user: models.User):
+
+    def add_user(
+            self, 
+            user_create: user_schema.UserCreate
+            ):
         """
-        Create a user.
+        Add a user.
         """
+        user = models.User(**user_create.model_dump())
 
         try:
             self.db.add(user)
@@ -33,13 +40,19 @@ class UserRepository:
             self.db.refresh(user)
         except IntegrityError:
             self.db.rollback()
-            raise IntegrityConstraintViolationException("User already exists")
+            if "UNIQUE constraint failed:" in str(IntegrityError):
+                raise IntegrityConstraintViolationException("User already exists")
+            raise IntegrityConstraintViolationException("Cannot add user")
 
         return user
 
-    def get_all_users(self, context: PaginationContext) -> PaginatedResponse[user_schema.UserResponse]:
+
+    def get_users(
+            self, 
+            context: PaginationContext
+            ) -> PaginatedResponse[user_schema.UserResponse]:
         """
-        Get all users.
+        Get users.
         """
         query = self.db.query(models.User)
 
@@ -50,14 +63,21 @@ class UserRepository:
 
         return results
     
-    def get_user_by_id(self, user_id: int) -> user_schema.UserResponse | None:
+    def get_user_by_id(
+            self, 
+            user_id: int
+            ) -> user_schema.UserResponse | None:
         """
         Get a user by id.
         """
         return self.db.query(models.User).filter(models.User.id == user_id).first()
 
 
-    def get_user_by_email(self, db: Session, email: EmailStr) -> user_schema.UserResponse | None:
+    def get_user_by_email(
+            self, 
+            db: Session, 
+            email: EmailStr
+            ) -> user_schema.UserResponse | None:
         """
         Get a user by email.
         """
