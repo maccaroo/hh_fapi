@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.schemas import data_point_schema
-from app.core.services import data_point_service
+from app.core.services import data_points_service
 from app.persistence.database import get_db
 
 
@@ -17,8 +17,8 @@ def add_data_point_endpoint(data_point_create: data_point_schema.DataPointCreate
     Create a data point.
     """
     try:
-        data_point = data_point_service.add_data_point(db, data_point_create)
-    except data_point_service.IntegrityConstraintViolationException as e:
+        data_point = data_points_service.add_data_point(db, data_point_create)
+    except data_points_service.IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
     return data_point
@@ -29,7 +29,7 @@ def get_data_point_endpoint(data_point_id: int, db: Session = Depends(get_db)):
     """
     Get a data point.
     """
-    data_point = data_point_service.get_data_point_by_id(db, data_point_id)
+    data_point = data_points_service.get_data_point_by_id(db, data_point_id)
     if not data_point:
         raise HTTPException(status_code=404, detail="Data point not found")
     return data_point
@@ -40,7 +40,7 @@ def delete_data_point_endpoint(data_point_id: int, db: Session = Depends(get_db)
     """
     Delete a data point.
     """
-    success = data_point_service.delete_data_point_by_id(db, data_point_id)
+    success = data_points_service.delete_data_point_by_id(db, data_point_id)
     if not success:
         raise HTTPException(status_code=404, detail="Data point not found")
     return

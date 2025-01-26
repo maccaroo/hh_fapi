@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import user_schema
 from app.core.services.exceptions import IntegrityConstraintViolationException
-from app.core.services.user_service import UsersService, get_users_service
+from app.core.services.users_service import UsersService, get_users_service
 from app.utils.pagination import PaginationContext
 
 

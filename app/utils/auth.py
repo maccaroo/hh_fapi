@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
-from app.core.services import user_service
+from app.core.services import users_service
 from app.persistence.database import get_db
 from app.config.app_config import settings
 
@@ -69,5 +69,5 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     token_data = verify_access_token(token, credentials_exception)
 
-    user = user_service.get_user_by_id(db, token_data["id"])
+    user = users_service.get_user_by_id(db, token_data["id"])
     return user

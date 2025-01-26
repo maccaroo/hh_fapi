@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import data_meta_schema, data_point_schema, data_schema
 from app.core.services.exceptions import IntegrityConstraintViolationException
-from app.core.services import data_meta_service, data_point_service, data_service
+from app.core.services import data_metas_service, data_points_service, datas_service
 from app.persistence.database import get_db
 from app.utils.auth import get_current_user
 from app.utils.pagination import PaginationContext
@@ -21,7 +21,7 @@ def create_data_endpoint(data_create: data_schema.DataCreate, db: Session = Depe
     Create a data.
     """
     try:
-        data = data_service.create_data(db, data_create, current_user.id)
+        data = datas_service.create_data(db, data_create, current_user.id)
     except IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     return data
@@ -39,7 +39,7 @@ def list_datas_endpoint(
     """
     context = PaginationContext(limit=limit, offset=offset, search=search, db=db)
     
-    paged_response = data_service.get_all_datas(context)
+    paged_response = datas_service.get_all_datas(context)
     return paged_response
 
 
@@ -48,7 +48,7 @@ def get_data_endpoint(data_id: int, db: Session = Depends(get_db)):
     """
     Get a data.
     """
-    data = data_service.get_data_by_id(db, data_id)
+    data = datas_service.get_data_by_id(db, data_id)
     if not data:
         raise HTTPException(status_code=404, detail="Data not found")
     return data
@@ -60,7 +60,7 @@ def update_data_endpoint(data_id: int, data_update: data_schema.DataUpdate, db: 
     Update a data.
     """
     try:
-        updated_data = data_service.update_data_by_id(db, data_id, data_update)
+        updated_data = datas_service.update_data_by_id(db, data_id, data_update)
     except IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
@@ -75,7 +75,7 @@ def delete_data_endpoint(data_id: int, db: Session = Depends(get_db)):
     Delete a data.
     """
     try:
-        success = data_service.delete_data_by_id(db, data_id)
+        success = datas_service.delete_data_by_id(db, data_id)
         if not success:
             raise HTTPException(status_code=404, detail="Data not found")
     except IntegrityConstraintViolationException as e:
@@ -97,11 +97,11 @@ def list_data_points_endpoint(
     """
     context = PaginationContext(limit=limit, offset=offset, db=db)
 
-    data = data_service.get_data_by_id(db, data_id)
+    data = datas_service.get_data_by_id(db, data_id)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     
-    paged_response = data_point_service.get_data_points(context, data_id)
+    paged_response = data_points_service.get_data_points(context, data_id)
     return paged_response
 
 
@@ -116,8 +116,8 @@ def create_data_meta_endpoint(data_id: int, data_meta_create: data_meta_schema.D
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Data id mismatch")
 
     try:
-        data_meta_res = data_meta_service.create_data_meta(db, data_meta_create)
-    except data_meta_service.IntegrityConstraintViolationException as ex:
+        data_meta_res = data_metas_service.create_data_meta(db, data_meta_create)
+    except data_metas_service.IntegrityConstraintViolationException as ex:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ex))
     
     return data_meta_res
@@ -134,11 +134,11 @@ def list_data_metas_endpoint(
     """
     context = PaginationContext(limit=limit, offset=offset, db=db)
 
-    data = data_service.get_data_by_id(db, data_id)
+    data = datas_service.get_data_by_id(db, data_id)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     
-    paged_response = data_meta_service.get_data_meta_by_data_id(context, data_id)
+    paged_response = data_metas_service.get_data_meta_by_data_id(context, data_id)
     return paged_response
 
 
@@ -147,7 +147,7 @@ def get_data_meta_endpoint(data_id: int, meta_id: int, db: Session = Depends(get
     """
     Get a data meta.
     """
-    data_meta = data_meta_service.get_data_meta_by_data_id_and_meta_id(db, data_id, meta_id)
+    data_meta = data_metas_service.get_data_meta_by_data_id_and_meta_id(db, data_id, meta_id)
     if not data_meta:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data meta not found")
     return data_meta
@@ -164,8 +164,8 @@ def update_data_meta_endpoint(data_id: int, meta_id: int, data_meta_update: data
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Meta id mismatch")
 
     try:
-        data_meta = data_meta_service.update_data_meta(db, data_meta_update)
-    except data_meta_service.IntegrityConstraintViolationException as ex:
+        data_meta = data_metas_service.update_data_meta(db, data_meta_update)
+    except data_metas_service.IntegrityConstraintViolationException as ex:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ex))
 
     if not data_meta:
@@ -178,7 +178,7 @@ def delete_data_meta_endpoint(data_id: int, meta_id: int, db: Session = Depends(
     """
     Delete a data meta.
     """
-    success = data_meta_service.delete_data_meta(db, data_id, meta_id)
+    success = data_metas_service.delete_data_meta(db, data_id, meta_id)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data meta not found")
     return
