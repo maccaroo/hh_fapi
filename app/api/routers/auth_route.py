@@ -3,7 +3,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.persistence.database import get_db
-from app.core.services import users_service
+from app.core.services import user_service
 import app.utils.auth as auth_utils
 
 
@@ -18,7 +18,7 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
     """
     Login a user.
     """
-    user = users_service.get_user_by_email(db, user_credentials.username)
+    user = user_service.get_user_by_email(db, user_credentials.username)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 

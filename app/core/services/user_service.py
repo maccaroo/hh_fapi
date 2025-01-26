@@ -4,22 +4,22 @@ from pydantic import EmailStr
 from app.persistence import models
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import user_schema
-from app.persistence.repositories.users_repo import UserRepository, get_users_repo
+from app.persistence.repositories.user_repo import UserRepository, get_user_repo
 from app.utils.auth import hash_password
 from app.utils.pagination import PaginationContext
 
 
-def get_users_service(repo = Depends(get_users_repo)):
-    return UsersService(repo)
+def get_user_service(repo = Depends(get_user_repo)):
+    return UserService(repo)
 
 
-class UsersService:
+class UserService:
     """
     Users service.
     """
 
-    def __init__(self, repo: UserRepository = Depends(get_users_repo)):
-        self.repo = repo
+    def __init__(self, user_repo: UserRepository = Depends(get_user_repo)):
+        self.repo = user_repo
 
 
     def create_user(self, user_create: user_schema.UserCreate) -> user_schema.UserResponse:

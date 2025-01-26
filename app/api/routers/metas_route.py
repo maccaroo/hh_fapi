@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.persistence.database import get_db
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.utils.auth import get_current_user
-from app.core.services import metas_service
+from app.core.services import meta_service
 from app.api.schemas import meta_schema
 from app.utils.pagination import PaginationContext
 
@@ -18,8 +18,8 @@ def create_meta_endpoint(meta_create: meta_schema.MetaCreate, db: Session = Depe
     Create a meta.
     """
     try:
-        meta = metas_service.create_meta(db, meta_create)
-    except metas_service.IntegrityConstraintViolationException as e:
+        meta = meta_service.create_meta(db, meta_create)
+    except meta_service.IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
     return meta
@@ -37,7 +37,7 @@ def list_metas_endpoint(
     """
     context = PaginationContext(limit=limit, offset=offset, search=search, db=db)
     
-    paged_response = metas_service.get_all_metas(context)
+    paged_response = meta_service.get_all_metas(context)
     return paged_response
 
 
@@ -46,7 +46,7 @@ def get_meta_endpoint(meta_id: int, db: Session = Depends(get_db)):
     """ 
     Get a meta.
     """
-    meta = metas_service.get_meta_by_id(db, meta_id)
+    meta = meta_service.get_meta_by_id(db, meta_id)
     if not meta:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Meta not found")
     return meta
@@ -58,8 +58,8 @@ def update_meta_endpoint(meta_id: int, meta_update: meta_schema.MetaUpdate, db: 
     Update a meta.
     """
     try:
-        updated_meta = metas_service.update_meta_by_id(db, meta_id, meta_update)
-    except metas_service.IntegrityConstraintViolationException as e:
+        updated_meta = meta_service.update_meta_by_id(db, meta_id, meta_update)
+    except meta_service.IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
     if not updated_meta:
@@ -73,9 +73,9 @@ def delete_meta_endpoint(meta_id: int, db: Session = Depends(get_db)):
     Delete a meta.
     """
     try:
-        success = metas_service.delete_meta_by_id(db, meta_id)
+        success = meta_service.delete_meta_by_id(db, meta_id)
         if not success: 
             raise HTTPException(status_code=404, detail="Meta not found")
-    except metas_service.IntegrityConstraintViolationException as e:
+    except meta_service.IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     return
