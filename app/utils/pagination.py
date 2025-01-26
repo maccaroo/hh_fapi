@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class PaginationContext:
-    db: Session
+    db: Session = None
     limit: int = 10
     offset: int = 0
     search: str = ""

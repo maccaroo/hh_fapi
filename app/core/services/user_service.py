@@ -1,58 +1,57 @@
+from fastapi import Depends
 from pydantic import EmailStr
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 
 from app.persistence import models
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import user_schema
-from app.core.services.exceptions import IntegrityConstraintViolationException
+from app.persistence.repositories.users_repo import UserRepository, get_users_repo
 from app.utils.auth import hash_password
-from app.utils.pagination import PaginationContext, paginate_query
+from app.utils.pagination import PaginationContext
 
 
-def create_user(db: Session, user_create: user_schema.UserCreate) -> user_schema.UserResponse:
+def get_users_service(repo = Depends(get_users_repo)):
+    return UsersService(repo)
+
+
+class UsersService:
     """
-    Create a user.
+    Users service.
     """
-    hashed_password = hash_password(user_create.password)
-    user_create.password = hashed_password
 
-    db_user = models.User(**user_create.model_dump())
-
-    try:
-        db.add(db_user)
-        db.commit()
-        db.refresh(db_user)
-    except IntegrityError:
-        db.rollback()
-        raise IntegrityConstraintViolationException("User already exists")
-
-    return db_user
+    def __init__(self, repo: UserRepository = Depends(get_users_repo)):
+        self.repo = repo
 
 
-def get_all_users(context: PaginationContext) -> PaginatedResponse[user_schema.UserResponse]:
-    """
-    Get all users.
-    """
-    query = context.db.query(models.User)
+    def create_user(self, user_create: user_schema.UserCreate) -> user_schema.UserResponse:
+        """
+        Create a user.
+        """
+        hashed_password = hash_password(user_create.password)
+        user_create.password = hashed_password
 
-    if context.search:
-        query = query.filter(models.User.username.contains(context.search))
+        user = models.User(**user_create.model_dump())
 
-    results = paginate_query(query, context.limit, context.offset)
+        created_user = self.repo.create_user(user)
 
-    return results
-
-
-def get_user_by_id(db: Session, user_id: int) -> user_schema.UserResponse | None:
-    """
-    Get a user by id.
-    """
-    return db.query(models.User).filter(models.User.id == user_id).first()
+        return created_user
 
 
-def get_user_by_email(db: Session, email: EmailStr) -> user_schema.UserResponse | None:
-    """
-    Get a user by email.
-    """
-    return db.query(models.User).filter(models.User.email == email).first()
+    def get_all_users(self, context: PaginationContext) -> PaginatedResponse[user_schema.UserResponse]:
+        """
+        Get all users.
+        """
+        return self.repo.get_all_users(context)
+
+
+    def get_user_by_id(self, user_id: int) -> user_schema.UserResponse | None:
+        """
+        Get a user by id.
+        """
+        return self.repo.get_user_by_id(user_id)
+
+
+    def get_user_by_email(self, email: EmailStr) -> user_schema.UserResponse | None:
+        """
+        Get a user by email.
+        """
+        return self.repo.get_user_by_email(email)
