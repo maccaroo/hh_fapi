@@ -26,7 +26,12 @@ Update pip
 ```bash
 pip install --upgrade pip
 ```
-Run the web server
+Run the server
+```bash
+python -m app.api.main
+```
+
+Alternatively, you can run the web server directly
 ```bash
 uvicorn app.main:app --reload
 ```

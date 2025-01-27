@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Uvicorn settings
+    UVICORN_HOST: str = "0.0.0.0"
+    UVICORN_PORT: int = 8000
+    UVICORN_RELOAD: bool = False
+
     # Load environment variables from .env
     class Config:
         env_file = ".env"
