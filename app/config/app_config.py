@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
 
+    # API settings
+    API_DEBUG: bool = False
+
     # Database settings
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
