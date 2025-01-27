@@ -8,10 +8,6 @@ from app.utils.auth import hash_password
 from app.utils.pagination import PaginationContext
 
 
-def get_user_service(user_repo = Depends(get_user_repo)):
-    return UserService(user_repo)
-
-
 class UserService:
     """
     User service.
@@ -77,3 +73,7 @@ class UserService:
         Delete a user by id.
         """
         return self.user_repo.delete_user_by_id(user_id)
+
+
+def get_user_service(user_repo: UserRepository = Depends(get_user_repo)) -> UserService:
+    return UserService(user_repo)

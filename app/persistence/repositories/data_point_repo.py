@@ -10,9 +10,6 @@ from app.persistence.database import get_db
 from app.utils.pagination import PaginationContext, paginate_query
 
 
-def get_data_point_repo(db: Session = Depends(get_db)):
-    return DataPointRepository(db)
-
 class DataPointRepository:
     """
     Data point repository.
@@ -90,4 +87,7 @@ class DataPointRepository:
         self.db.commit()
 
         return True
-        
+
+
+def get_data_point_repo(db: Session = Depends(get_db)) -> DataPointRepository:
+    return DataPointRepository(db)

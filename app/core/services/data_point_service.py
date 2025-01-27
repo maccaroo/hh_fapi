@@ -6,10 +6,6 @@ from app.persistence.repositories.data_point_repo import DataPointRepository, ge
 from app.utils.pagination import PaginationContext
 
 
-def get_data_point_service(data_point_repo = Depends(get_data_point_repo)):
-    return DataPointService(data_point_repo)
-
-
 class DataPointService:
     """
     Data point service.
@@ -63,3 +59,7 @@ class DataPointService:
         Delete a data point by id.
         """
         return self.data_point_repo.delete_data_point_by_id(data_point_id)
+
+
+def get_data_point_service(data_point_repo: DataPointRepository = Depends(get_data_point_repo)) -> DataPointService:
+    return DataPointService(data_point_repo)

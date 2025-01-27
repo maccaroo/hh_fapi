@@ -11,9 +11,6 @@ from app.persistence.database import get_db
 from app.utils.pagination import PaginationContext, paginate_query
 
 
-def get_user_repo(db: Session = Depends(get_db)):
-    return UserRepository(db)
-
 class UserRepository:
     """
     User repository.
@@ -99,3 +96,7 @@ class UserRepository:
         self.db.commit()
 
         return True
+
+
+def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
+    return UserRepository(db)
