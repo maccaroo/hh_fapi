@@ -67,3 +67,13 @@ class UserService:
         Get a user by email.
         """
         return self.user_repo.get_user_by_email(email)
+
+
+    def delete_user_by_id(
+            self, 
+            user_id: int
+            ) -> bool:
+        """
+        Delete a user by id.
+        """
+        return self.user_repo.delete_user_by_id(user_id)

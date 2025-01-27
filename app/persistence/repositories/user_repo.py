@@ -82,3 +82,20 @@ class UserRepository:
         Get a user by email.
         """
         return self.db.query(models.User).filter(models.User.email == email).first()
+
+
+    def delete_user_by_id(
+            self, 
+            user_id: int
+            ) -> bool:
+        """
+        Delete a user by id.
+        """
+        db_user = self.db.query(models.User).filter(models.User.id == user_id).first()
+        if not db_user:
+            return False
+        
+        self.db.delete(db_user)
+        self.db.commit()
+
+        return True

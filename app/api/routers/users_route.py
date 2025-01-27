@@ -57,3 +57,21 @@ def get_user_endpoint(
         raise HTTPException(status_code=404, detail="User not found")
     
     return user
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user_endpoint(
+    user_id: int, 
+    user_service: UserService = Depends(get_user_service)
+    ):
+    """
+    Delete a user.
+    """
+    try:
+        success = user_service.delete_user_by_id(user_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="User not found")
+    except IntegrityConstraintViolationException as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    
+    return
