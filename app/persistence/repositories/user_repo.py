@@ -25,7 +25,7 @@ class UserRepository:
     def add_user(
             self, 
             user_create: user_schema.UserCreate
-            ):
+            ) -> user_schema.UserResponse:
         """
         Add a user.
         """
@@ -71,8 +71,7 @@ class UserRepository:
 
 
     def get_user_by_email(
-            self, 
-            db: Session, 
+            self,
             email: EmailStr
             ) -> user_schema.UserResponse | None:
         """

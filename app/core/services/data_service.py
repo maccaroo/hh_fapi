@@ -1,93 +1,74 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from fastapi import Depends
 
-from app.persistence import models
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import data_schema
-from app.core.services.exceptions import IntegrityConstraintViolationException
-from app.utils.pagination import PaginationContext, paginate_query
+from app.persistence.repositories.data_repo import DataRepository, get_data_repo
+from app.utils.pagination import PaginationContext
 
 
-def create_data(db: Session, data_create: data_schema.DataCreate, user_id: int) -> data_schema.DataResponse:
+class DataService:
     """
-    Create a data.
+    Data service.
     """
-    db_data = models.Data(**data_create.model_dump())
-    db_data.created_by_user_id = user_id
 
-    try:
-        db.add(db_data)
-        db.commit()
-        db.refresh(db_data)
-    except IntegrityError as ex:
-        db.rollback()
-        if "UNIQUE constraint failed:" in str(ex):
-            raise IntegrityConstraintViolationException("Data already exists")
-        elif "check_data_type_value" in str(ex):
-            raise IntegrityConstraintViolationException(f"Invalid value for 'data_type': {data_create.data_type}")
-        else:
-            raise IntegrityConstraintViolationException(f"Cannot create data: {ex}")
+    def __init__(
+            self,
+            data_repo: DataRepository = Depends(get_data_repo)
+            ):
+        self.data_repo = data_repo
+
+
+    def add_data(
+            self, 
+            data_create: data_schema.DataCreate,
+            user_id: int
+            ) -> data_schema.DataResponse:
+        """
+        Add a data.
+        """
+        return self.data_repo.add_data(data_create, user_id)
+
+
+    def get_datas(
+            self, 
+            context: PaginationContext
+            ) -> PaginatedResponse[data_schema.DataResponse]:
+        """
+        Get all datas.
+        """
+        return self.data_repo.get_datas(context)
+
+
+    def get_data_by_id(
+            self, 
+            data_id: int
+            ) -> data_schema.DataResponse | None:
+        """
+        Get a data by id.
+        """
+        return self.data_repo.get_data_by_id(data_id)
+
+
+    def update_data_by_id(
+            self, 
+            data_id: int, 
+            data_update: data_schema.DataUpdate
+            ) -> data_schema.DataResponse | None:
+        """
+        Update a data by id.
+        """
+        return self.data_repo.update_data_by_id(data_id, data_update)
+
+
+    def delete_data_by_id(
+            self, 
+            data_id: int
+            ) -> bool:
+        """
+        Delete a data by id.
+        """
+        return self.data_repo.delete_data_by_id(data_id)
     
-    return db_data
 
-
-def get_all_datas(context: PaginationContext) -> PaginatedResponse[data_schema.DataResponse]:
-    """
-    Get all datas.
-    """
-    query = context.db.query(models.Data)
-
-    if context.search:
-        query = query.filter(models.Data.name.contains(context.search))
-
-    results = paginate_query(query, context.limit, context.offset)
-
-    return results
-
-
-def get_data_by_id(db: Session, data_id: int) -> data_schema.DataResponse | None:
-    """
-    Get a data by id.
-    """
-    db_data = db.query(models.Data).filter(models.Data.id == data_id).first()
-    if not db_data:
-        return None
-
-    return db_data
-
-
-def update_data_by_id(db: Session, data_id: int, data_update: data_schema.DataUpdate) -> data_schema.DataResponse | None:
-    """
-    Update a data by id.
-    """
-    db_data = db.query(models.Data).filter(models.Data.id == data_id).first()
-    if not db_data:
-        return None
-    
-    try:
-        db.query(models.Data).filter(models.Data.id == data_id).update(data_update.model_dump())
-        db.commit()
-        db.refresh(db_data)
-    except IntegrityError:
-        db.rollback()
-        raise IntegrityConstraintViolationException("Cannot update data")
-
-    return db_data
-
-
-def delete_data_by_id(db: Session, data_id: int) -> bool:
-    """
-    Delete a data by id.
-    """
-    db_data = db.query(models.Data).filter(models.Data.id == data_id).first()
-    if not db_data:
-        return False
-    
-    try:
-        db.delete(db_data)
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        raise IntegrityConstraintViolationException("Cannot delete data")
-    
-    return True
+def get_data_service(data_repo: DataRepository = Depends(get_data_repo)) -> DataService:
+    return DataService(data_repo)

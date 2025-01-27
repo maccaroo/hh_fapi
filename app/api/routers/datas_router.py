@@ -1,14 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
 
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.api.schemas import data_meta_schema, data_point_schema, data_schema
 from app.core.services.exceptions import IntegrityConstraintViolationException
-from app.core.services import data_service
+from app.core.services.data_service import DataService, get_data_service
 from app.core.services.data_point_service import DataPointService, get_data_point_service
 from app.core.services.data_meta_service import DataMetaService, get_data_meta_service
-from app.persistence.database import get_db
-from app.utils.auth import get_current_user
+from app.utils.auth import get_current_user_id
 from app.utils.pagination import PaginationContext
 
 
@@ -20,14 +18,14 @@ router = APIRouter(prefix="/datas", tags=["Datas"])
 @router.post("/", response_model=data_schema.DataResponse, status_code=status.HTTP_201_CREATED)
 def create_data_endpoint(
     data_create: data_schema.DataCreate, 
-    db: Session = Depends(get_db), 
-    current_user: dict = Depends(get_current_user)
+    data_service: DataService = Depends(get_data_service),
+    current_user_id: dict = Depends(get_current_user_id)
     ):
     """
     Create a data.
     """
     try:
-        data = data_service.create_data(db, data_create, current_user.id)
+        data = data_service.add_data(data_create, current_user_id)
     except IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     return data
@@ -38,26 +36,26 @@ def list_datas_endpoint(
     search: str = Query(None, description="Search"),
     limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
     offset: int = Query(0, ge=0, description="Number of records to skip"),
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service)
     ):
     """
     Get all datas.
     """
-    context = PaginationContext(limit=limit, offset=offset, search=search, db=db)
+    context = PaginationContext(limit=limit, offset=offset, search=search)
     
-    paged_response = data_service.get_all_datas(context)
+    paged_response = data_service.get_datas(context)
     return paged_response
 
 
 @router.get("/{data_id}", response_model=data_schema.DataResponse)
 def get_data_endpoint(
     data_id: int, 
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service)
     ):
     """
     Get a data.
     """
-    data = data_service.get_data_by_id(db, data_id)
+    data = data_service.get_data_by_id(data_id)
     if not data:
         raise HTTPException(status_code=404, detail="Data not found")
     return data
@@ -67,13 +65,13 @@ def get_data_endpoint(
 def update_data_endpoint(
     data_id: int, 
     data_update: data_schema.DataUpdate, 
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service),
     ):
     """
     Update a data.
     """
     try:
-        updated_data = data_service.update_data_by_id(db, data_id, data_update)
+        updated_data = data_service.update_data_by_id(data_id, data_update)
     except IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     
@@ -85,13 +83,13 @@ def update_data_endpoint(
 @router.delete("/{data_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_data_endpoint(
     data_id: int, 
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service)
     ):
     """
     Delete a data.
     """
     try:
-        success = data_service.delete_data_by_id(db, data_id)
+        success = data_service.delete_data_by_id(data_id)
         if not success:
             raise HTTPException(status_code=404, detail="Data not found")
     except IntegrityConstraintViolationException as e:
@@ -108,14 +106,14 @@ def list_data_points_endpoint(
     limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
     offset: int = Query(0, ge=0, description="Number of records to skip"),
     data_point_service: DataPointService = Depends(get_data_point_service),
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service)
     ):
     """
     Get all data points for a data.
     """
     context = PaginationContext(limit=limit, offset=offset)
 
-    data = data_service.get_data_by_id(db, data_id)
+    data = data_service.get_data_by_id(data_id)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     
@@ -129,6 +127,7 @@ def list_data_points_endpoint(
 def create_data_meta_endpoint(
     data_id: int, 
     data_meta_create: data_meta_schema.DataMetaCreate,
+    data_service: DataService = Depends(get_data_service),
     data_meta_service: DataMetaService = Depends(get_data_meta_service)
     ):
     """
@@ -136,6 +135,10 @@ def create_data_meta_endpoint(
     """
     if not data_id == data_meta_create.data_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Data id mismatch")
+    
+    data = data_service.get_data_by_id(data_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
 
     try:
         data_meta_res = data_meta_service.create_data_meta(data_meta_create)
@@ -151,13 +154,13 @@ def list_data_metas_endpoint(
     limit: int = Query(10, ge=1, le=100, description="Number of records to fetch"),
     offset: int = Query(0, ge=0, description="Number of records to skip"),
     data_meta_service: DataMetaService = Depends(get_data_meta_service),
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service)
     ):
     """
     Get all data metas for a data.
     """
     try:
-        data = data_service.get_data_by_id(db, data_id)
+        data = data_service.get_data_by_id(data_id)
         if not data:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
 
@@ -174,12 +177,12 @@ def get_data_meta_endpoint(
     data_id: int, 
     meta_id: int, 
     data_meta_service: DataMetaService = Depends(get_data_meta_service),
-    db: Session = Depends(get_db)
+    data_service: DataService = Depends(get_data_service)
     ):
     """
     Get a data meta.
     """
-    data = data_service.get_data_by_id(db, data_id)
+    data = data_service.get_data_by_id(data_id)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     
@@ -194,6 +197,7 @@ def update_data_meta_endpoint(
     data_id: int, 
     meta_id: int, 
     data_meta_update: data_meta_schema.DataMetaUpdate,
+    data_service: DataService = Depends(get_data_service),
     data_meta_service: DataMetaService = Depends(get_data_meta_service)
     ):
     """
@@ -203,6 +207,10 @@ def update_data_meta_endpoint(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Data id mismatch")
     elif not meta_id == data_meta_update.meta_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Meta id mismatch")
+    
+    data = data_service.get_data_by_id(data_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
 
     try:
         data_meta = data_meta_service.update_data_meta(data_meta_update)
@@ -218,11 +226,16 @@ def update_data_meta_endpoint(
 def delete_data_meta_endpoint(
     data_id: int, 
     meta_id: int,
+    data_service: DataService = Depends(get_data_service),
     data_meta_service: DataMetaService = Depends(get_data_meta_service)
     ):
     """
     Delete a data meta.
     """
+    data = data_service.get_data_by_id(data_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
+    
     success = data_meta_service.delete_data_meta(data_id, meta_id)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data meta not found")

@@ -3,10 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from sqlalchemy.orm import Session
 
-from app.core.services import user_service
-from app.persistence.database import get_db
 from app.config.app_config import settings
 
 
@@ -14,21 +11,29 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-def hash_password(password: str):
+def hash_password(
+        password: str
+        ):
     """
     Hash a password.
     """
     return pwd_context.hash(password)
 
 
-def verify_password(plain_password: str, hashed_password: str):
+def verify_password(
+        plain_password: str, 
+        hashed_password: str
+        ):
     """
     Verify a password.
     """
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: dict, expires_delta: int = None):
+def create_access_token(
+        data: dict, 
+        expires_delta: int = None
+        ):
     """
     Create an access token.
     """
@@ -42,7 +47,10 @@ def create_access_token(data: dict, expires_delta: int = None):
     return encoded_jwt
 
 
-def verify_access_token(token: str, credentials_exception):
+def verify_access_token(
+        token: str, 
+        credentials_exception: Exception
+        ):
     """
     Verify an access token.
     """
@@ -58,7 +66,9 @@ def verify_access_token(token: str, credentials_exception):
     return token_data
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user_id(
+        token: str = Depends(oauth2_scheme)
+        ):
     """
     Get the current user.
     """
@@ -69,5 +79,4 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     token_data = verify_access_token(token, credentials_exception)
 
-    user = user_service.get_user_by_id(db, token_data["id"])
-    return user
+    return token_data["id"]

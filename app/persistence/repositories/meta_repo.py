@@ -25,7 +25,7 @@ class MetaRepository:
     def create_meta(
             self,
             meta_create: meta_schema.MetaCreate
-            ) -> models.Meta:
+            ) -> meta_schema.MetaResponse:
         """
         Create a meta.
         """
@@ -47,7 +47,10 @@ class MetaRepository:
         return db_meta
     
 
-    def get_metas(self, context: PaginationContext) -> PaginatedResponse[meta_schema.MetaResponse]:
+    def get_metas(
+            self, 
+            context: PaginationContext
+            ) -> PaginatedResponse[meta_schema.MetaResponse]:
         """
         Get metas.
         """
@@ -61,14 +64,21 @@ class MetaRepository:
         return results
     
 
-    def get_meta_by_id(self, meta_id: int) -> models.Meta | None:
+    def get_meta_by_id(
+            self, 
+            meta_id: int
+            ) -> meta_schema.MetaResponse | None:
         """
         Get a meta by id.
         """
         return self.db.query(models.Meta).filter(models.Meta.id == meta_id).first()
     
 
-    def update_meta_by_id(self, meta_id: int, meta_update: meta_schema.MetaUpdate) -> models.Meta | None:
+    def update_meta_by_id(
+            self, 
+            meta_id: int, 
+            meta_update: meta_schema.MetaUpdate
+            ) -> meta_schema.MetaResponse | None:
         """
         Update a meta by id.
         """
@@ -87,7 +97,10 @@ class MetaRepository:
         return db_meta
     
 
-    def delete_meta_by_id(self, meta_id: int) -> bool:
+    def delete_meta_by_id(
+            self, 
+            meta_id: int
+            ) -> bool:
         """
         Delete a meta by id.
         """

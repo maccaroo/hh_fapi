@@ -1,10 +1,11 @@
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Query
 from dataclasses import dataclass
+
+from app.api.schemas.pagination_schema import PaginatedResponse
 
 
 @dataclass
 class PaginationContext:
-    db: Session = None
     limit: int = 10
     offset: int = 0
     search: str = ""
@@ -13,9 +14,9 @@ class PaginationContext:
 def paginate_query(query: Query, limit: int, offset: int):
     total = query.count()
     results = query.offset(offset).limit(limit).all()
-    return {
-        "total": total,
-        "limit": limit,
-        "offset": offset,
-        "items": results,
-    }
+    return PaginatedResponse(
+        total=total, 
+        limit=limit, 
+        offset=offset, 
+        items=results
+        )
