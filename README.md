@@ -26,6 +26,10 @@ Update pip
 ```bash
 pip install --upgrade pip
 ```
+Install module requirements
+```bash
+pip install -r requirements.txt
+```
 Run the project
 ```bash
 python -m app.api.main
