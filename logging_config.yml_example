@@ -1,0 +1,53 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  default:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  access:
+    format: "%(asctime)s - %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+    level: INFO
+  file:
+    class: logging.FileHandler
+    formatter: default
+    filename: logs/app.log
+    level: INFO
+  error_file:
+    class: logging.FileHandler
+    formatter: default
+    filename: logs/app.error.log
+    level: ERROR
+  access_file:
+    class: logging.FileHandler
+    formatter: access
+    filename: logs/app.access.log
+    level: INFO
+
+loggers:
+  uvicorn:
+    level: INFO
+    handlers: [console, file]
+    propagate: False
+  uvicorn.error:
+    level: ERROR
+    handlers: [console, error_file]
+    propagate: False
+  uvicorn.access:
+    level: INFO
+    handlers: [access_file]
+    propagate: False
+
+  app.api.datas:
+    level: INFO
+    handlers: [console, file]
+    propagate: True
+
+
+root:
+  level: INFO
+  handlers: [console, file]

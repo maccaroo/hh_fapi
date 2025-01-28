@@ -1,4 +1,6 @@
 venv
+logs
+logging_config.yml
 __pycache__/
 *.db
 .env

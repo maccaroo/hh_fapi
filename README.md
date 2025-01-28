@@ -26,7 +26,7 @@ Update pip
 ```bash
 pip install --upgrade pip
 ```
-Run the server
+Run the project
 ```bash
 python -m app.api.main
 ```
