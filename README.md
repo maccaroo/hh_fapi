@@ -11,7 +11,7 @@ Home Historian is a system for the collection of time-series data from around th
 * User - Users of the system
 * Data - Some items of data to be tracked.
 * DataPoint - Points for some `Data`.
-* Meta - Metadata information.
+* Meta - Definitions of meta information.
 * DataMeta - `Meta` information for some `Data`.
 
 # What requirements are there?
