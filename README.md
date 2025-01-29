@@ -26,7 +26,7 @@ Update pip
 ```bash
 pip install --upgrade pip
 ```
-Install module requirements
+Install project requirements
 ```bash
 pip install -r requirements.txt
 ```
