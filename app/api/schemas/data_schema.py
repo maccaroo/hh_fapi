@@ -1,17 +1,6 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 from pydantic import BaseModel
-
-
-class CreatedByUser(BaseModel):
-    id: int
-    username: str
-    email: str
-
-
-class MetaValue(BaseModel):
-    name: str
-    value: str
 
 
 class DataBase(BaseModel):
@@ -31,7 +20,7 @@ class DataUpdate(DataBase):
 class DataResponse(DataBase):
     id: int
     created_at: datetime
-    created_by_user: CreatedByUser
+    created_by_user_id: int
     data_type: str
 
     class Config:

@@ -78,7 +78,7 @@ class User(BaseWithToDict):
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
 
-    datas = relationship("Data", back_populates="created_by_user")
+    datas = relationship("Data", back_populates="created_by_user", lazy="noload")
 
 
 data_types = ["string", "integer", "float", "datetime"]
@@ -98,9 +98,9 @@ class Data(BaseWithToDict):
     description = Column(Text, nullable=True)
     data_type = Column(String, nullable=False)
 
-    data_points = relationship("DataPoint", back_populates="data")
-    created_by_user = relationship("User", back_populates="datas")
-    data_metas = relationship("DataMeta")
+    data_points = relationship("DataPoint", back_populates="data", lazy="noload")
+    created_by_user = relationship("User", back_populates="datas", lazy="noload")
+    data_metas = relationship("DataMeta", back_populates="data", lazy="noload")
 
 
 class DataPoint(BaseWithToDict):
@@ -112,7 +112,7 @@ class DataPoint(BaseWithToDict):
     created_at = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
     value = Column(JSON, nullable=False)
 
-    data = relationship("Data", back_populates="data_points")
+    data = relationship("Data", back_populates="data_points", lazy="noload")
 
 
 meta_types = ["string", "integer", "float", "datetime"]
@@ -129,7 +129,7 @@ class Meta(BaseWithToDict):
     name = Column(String, unique=True, nullable=False)
     meta_type = Column(String, nullable=False)
 
-    data_metas = relationship("DataMeta", back_populates="meta")
+    data_metas = relationship("DataMeta", back_populates="meta", lazy="noload")
 
 
 class DataMeta(BaseWithToDict):
@@ -141,7 +141,7 @@ class DataMeta(BaseWithToDict):
     meta_id = Column(Integer, ForeignKey("hh.meta.id", ondelete="RESTRICT"), nullable=False)
     value = Column(JSON, nullable=False)
 
-    data = relationship("Data", back_populates="data_metas")
-    meta = relationship("Meta")
+    data = relationship("Data", back_populates="data_metas", lazy="noload")
+    meta = relationship("Meta", back_populates="data_metas", lazy="noload")
 
     # TODO: Add validation for 'value' column.
