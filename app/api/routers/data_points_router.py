@@ -4,6 +4,7 @@ from app.api.schemas import data_point_schema
 from app.api.schemas.pagination_schema import PaginatedResponse
 from app.core.services.data_point_service import DataPointService, get_data_point_service
 from app.core.services.data_service import DataService, get_data_service
+from app.core.services.exceptions import IntegrityConstraintViolationException, NotFoundException, ValidationException
 from app.utils.pagination import PaginationContext
 
 
@@ -15,19 +16,21 @@ def add_data_point_endpoint(
     data_id: int,
     data_point_create: data_point_schema.DataPointCreate, 
     data_point_service: DataPointService = Depends(get_data_point_service),
-    data_service: DataService = Depends(get_data_service)
     ):
     """
     Create a data point.
     """
-    data = data_service.get_data_by_id(data_id)
-    if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
+    if not data_id == data_point_create.data_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Data id mismatch")
     
     try:
         data_point = data_point_service.add_data_point(data_point_create)
-    except data_point_service.IntegrityConstraintViolationException as e:
+    except IntegrityConstraintViolationException as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except NotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except ValidationException as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
     return data_point
 

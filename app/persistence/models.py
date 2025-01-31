@@ -81,7 +81,7 @@ class User(BaseWithToDict):
     datas = relationship("Data", back_populates="created_by_user", lazy="noload")
 
 
-data_types = ["string", "integer", "float", "datetime"]
+data_types = ["string", "integer", "float", "datetime"] # TODO: This should use the values from the DataType enum
 data_types_joined = ','.join(['\'' + _dt + '\'' for _dt in data_types])
 
 class Data(BaseWithToDict):
