@@ -5,7 +5,7 @@ import uvicorn
 
 from app.config.app_config import settings
 from app.config.logging_config import init_logger, get_module_logger
-from app.api.routers import auth_router, data_metas_router, data_points_router, datas_router, metas_router, root_router, users_router
+from app.api.routers import auth_router, data_metas_router, data_points_router, datas_router, metas_router, root_router, users_router, catch_all
 from app.persistence.database import init_db
 
 
@@ -43,6 +43,7 @@ app.include_router(data_points_router.router)
 app.include_router(users_router.router)
 app.include_router(metas_router.router)
 app.include_router(data_metas_router.router)
+app.include_router(catch_all.router)
 
 
 if __name__ == "__main__":
